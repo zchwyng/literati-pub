@@ -763,7 +763,7 @@ export default function ProjectWorkspace({
 
           {activeTab === 'cover' && (
             <div>
-            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-orange-700 to-orange-800 hover:from-orange-700/95 hover:to-orange-800/95 text-left max-w-3xl transition-all">
+              <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-orange-700 to-orange-800 hover:from-orange-700/95 hover:to-orange-800/95 text-left max-w-3xl transition-all">
               <div className="absolute top-4 right-4">
                 <Popover>
                   <PopoverTrigger asChild>
@@ -923,9 +923,9 @@ export default function ProjectWorkspace({
                   )}
                 </button>
               </div>
-            </div>
+              </div>
 
-            {/* Cover Gallery - Show template covers or generated covers */}
+              {/* Cover Gallery - Show template covers or generated covers */}
             <div className="mt-6">
               {coverGenerations.length === 0 ? (
                 <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
@@ -1041,12 +1041,13 @@ export default function ProjectWorkspace({
                   </CardContent>
                 </Card>
               )}
+              </div>
             </div>
           )}
 
           {activeTab === 'audio' && (
             <div>
-            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-rose-700 to-rose-800 hover:from-rose-700/95 hover:to-rose-800/95 text-left max-w-3xl transition-all">
+              <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-rose-700 to-rose-800 hover:from-rose-700/95 hover:to-rose-800/95 text-left max-w-3xl transition-all">
               <div className="absolute top-4 right-4">
                 <Popover>
                   <PopoverTrigger asChild>
@@ -1161,10 +1162,11 @@ export default function ProjectWorkspace({
                 </div>
               </div>
             </div>
+            </div>
           )}
 
           {/* Empty State - Upload Section */}
-        {isProjectPage && !preview && activeTab !== 'cover' && (
+          {isProjectPage && !preview && activeTab !== 'cover' && (
           <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm p-0 mt-6">
             <div
               onDragOver={handleDragOver}
@@ -1224,7 +1226,58 @@ export default function ProjectWorkspace({
             </div>
           </Card>
         )}
+        </div>
 
+        {/* Sticky Bottom Navigation */}
+        <div className="sticky bottom-0 left-0 right-0 border-t border-sidebar-border bg-background/95 backdrop-blur-sm z-10 shrink-0 p-4 h-[72px] flex items-center">
+          <div className="flex items-center gap-1">
+            <Button
+              variant={activeTab === 'edit' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('edit')}
+              className="flex items-center gap-2 h-10"
+            >
+              <FileEdit className="h-4 w-4" />
+              Edit
+            </Button>
+            <Button
+              variant={activeTab === 'cover' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('cover')}
+              className="flex items-center gap-2 h-10"
+            >
+              <Palette className="h-4 w-4" />
+              Cover
+            </Button>
+            <Button
+              variant={activeTab === 'print' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('print')}
+              className="flex items-center gap-2 h-10"
+            >
+              <BookOpen className="h-4 w-4" />
+              Print
+            </Button>
+            <Button
+              variant={activeTab === 'ebook' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('ebook')}
+              className="flex items-center gap-2 h-10"
+            >
+              <Tablet className="h-4 w-4" />
+              E-book
+            </Button>
+            <Button
+              variant={activeTab === 'audio' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setActiveTab('audio')}
+              className="flex items-center gap-2 h-10"
+            >
+              <Mic className="h-4 w-4" />
+              Audiobook
+            </Button>
+          </div>
+        </div>
       </main>
 
     </div>
