@@ -4,7 +4,74 @@ import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { pool } from './db';
 import { stackServerApp } from '../stack';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, cacheTag, revalidateTag } from 'next/cache';
+
+// --- Internal Cached Functions ---
+
+async function getProjectsInternal(userId: string) {
+  'use cache';
+  cacheTag(`user-${userId}-projects`);
+
+  try {
+    const result = await pool.query(
+      'SELECT * FROM projects WHERE user_id = $1 AND COALESCE(archived, false) = false ORDER BY COALESCE(pinned, false) DESC, created_at DESC',
+      [userId]
+    );
+    return result.rows;
+  } catch (error) {
+    // If pinned or archived column doesn't exist yet, fall back to simple query
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === '42703'
+    ) {
+      const result = await pool.query(
+        'SELECT * FROM projects WHERE user_id = $1 ORDER BY created_at DESC',
+        [userId]
+      );
+      return result.rows;
+    }
+    throw error;
+  }
+}
+
+async function getProjectInternal(id: string, userId: string) {
+  'use cache';
+  cacheTag(`project-${id}`);
+
+  const result = await pool.query(
+    'SELECT * FROM projects WHERE id = $1 AND user_id = $2',
+    [id, userId]
+  );
+  return result.rows[0];
+}
+
+async function getAudioGenerationsInternal(projectId: string) {
+  'use cache';
+  cacheTag(`project-${projectId}-audio`);
+
+  const result = await pool.query(
+    'SELECT * FROM audio_generations WHERE project_id = $1 ORDER BY created_at DESC',
+    [projectId]
+  );
+  return result.rows;
+}
+
+async function getCoverGenerationsInternal(projectId: string) {
+  'use cache';
+  cacheTag(`project-${projectId}-covers`);
+
+  try {
+    const result = await pool.query(
+      'SELECT * FROM cover_generations WHERE project_id = $1 ORDER BY created_at DESC',
+      [projectId]
+    );
+    return result.rows;
+  } catch {
+    return [];
+  }
+}
 
 // --- Project Management ---
 
@@ -21,6 +88,7 @@ export async function createProject(title: string, content: string) {
     [user.id, title, content]
   );
 
+  revalidateTag(`user-${user.id}-projects`, 'max');
   revalidatePath('/dashboard');
   return result.rows[0].id;
 }
@@ -28,40 +96,13 @@ export async function createProject(title: string, content: string) {
 export async function getProjects() {
   const user = await stackServerApp.getUser();
   if (!user) return [];
-
-  try {
-    const result = await pool.query(
-      'SELECT * FROM projects WHERE user_id = $1 AND COALESCE(archived, false) = false ORDER BY COALESCE(pinned, false) DESC, created_at DESC',
-      [user.id]
-    );
-    return result.rows;
-  } catch (error) {
-    // If pinned or archived column doesn't exist yet, fall back to simple query
-    if (
-      error &&
-      typeof error === 'object' &&
-      'code' in error &&
-      error.code === '42703'
-    ) {
-      const result = await pool.query(
-        'SELECT * FROM projects WHERE user_id = $1 ORDER BY created_at DESC',
-        [user.id]
-      );
-      return result.rows;
-    }
-    throw error;
-  }
+  return getProjectsInternal(user.id);
 }
 
 export async function getProject(id: string) {
   const user = await stackServerApp.getUser();
   if (!user) return null;
-
-  const result = await pool.query(
-    'SELECT * FROM projects WHERE id = $1 AND user_id = $2',
-    [id, user.id]
-  );
-  return result.rows[0];
+  return getProjectInternal(id, user.id);
 }
 
 export async function updateProject(
@@ -97,6 +138,8 @@ export async function updateProject(
     values
   );
 
+  revalidateTag(`project-${id}`, 'max');
+  revalidateTag(`user-${user.id}-projects`, 'max');
   revalidatePath(`/dashboard/project/${id}`);
   revalidatePath('/dashboard');
 }
@@ -109,6 +152,8 @@ export async function deleteProject(id: string) {
     id,
     user.id,
   ]);
+  revalidateTag(`user-${user.id}-projects`, 'max');
+  revalidateTag(`project-${id}`, 'max');
   revalidatePath('/dashboard');
 }
 
@@ -144,6 +189,8 @@ export async function togglePinProject(id: string) {
     }
   }
 
+  revalidateTag(`project-${id}`, 'max');
+  revalidateTag(`user-${user.id}-projects`, 'max');
   revalidatePath('/dashboard');
   revalidatePath(`/dashboard/project/${id}`);
   return newPinnedStatus;
@@ -186,6 +233,8 @@ export async function toggleArchiveProject(id: string) {
     }
   }
 
+  revalidateTag(`project-${id}`, 'max');
+  revalidateTag(`user-${user.id}-projects`, 'max');
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/archive');
   revalidatePath(`/dashboard/project/${id}`);
@@ -199,15 +248,10 @@ export async function getAudioGenerations(projectId: string) {
   if (!user) return [];
 
   // Verify ownership implicitly by joining or checking project first.
-  // Simple check:
   const project = await getProject(projectId);
   if (!project) return [];
 
-  const result = await pool.query(
-    'SELECT * FROM audio_generations WHERE project_id = $1 ORDER BY created_at DESC',
-    [projectId]
-  );
-  return result.rows;
+  return getAudioGenerationsInternal(projectId);
 }
 
 export async function generateTtsForProject(projectId: string) {
@@ -247,6 +291,7 @@ export async function generateTtsForProject(projectId: string) {
       [projectId, blob.url]
     );
 
+    revalidateTag(`project-${projectId}-audio`, 'max');
     revalidatePath(`/dashboard`);
     return blob.url;
   } catch (error) {
@@ -329,6 +374,7 @@ export async function generateCoverImage(
       // Continue even if DB save fails
     }
 
+    revalidateTag(`project-${projectId}-covers`, 'max');
     revalidatePath(`/dashboard/project/${projectId}`);
     return blob.url;
   } catch (error) {
@@ -344,16 +390,7 @@ export async function getCoverGenerations(projectId: string) {
   const project = await getProject(projectId);
   if (!project) return [];
 
-  try {
-    const result = await pool.query(
-      'SELECT * FROM cover_generations WHERE project_id = $1 ORDER BY created_at DESC',
-      [projectId]
-    );
-    return result.rows;
-  } catch {
-    // Table might not exist yet
-    return [];
-  }
+  return getCoverGenerationsInternal(projectId);
 }
 
 // Legacy/Simple Action (Optional, kept for reference or quick testing)

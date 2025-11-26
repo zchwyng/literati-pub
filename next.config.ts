@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // @ts-ignore - cacheComponents is available in Next.js 15+ (canary/rc) or 16
+    cacheComponents: true,
+  },
   images: {
     remotePatterns: [
       {

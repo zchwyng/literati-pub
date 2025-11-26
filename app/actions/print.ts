@@ -3,7 +3,7 @@
 import { put } from '@vercel/blob';
 import { pool } from '../db';
 import { stackServerApp } from '../../stack';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, cacheTag, revalidateTag } from 'next/cache';
 import mammoth from 'mammoth';
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
@@ -171,12 +171,35 @@ export async function createPrintJob(
       access: 'public',
     });
 
-    // DB Record
-    const result = await pool.query(
-      'INSERT INTO print_jobs (project_id, original_file_url, status, format, font) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-      [projectId, originalBlob.url, 'processing', format, fontKey]
-    );
-    const jobId = result.rows[0].id;
+    // DB Record - store original filename
+    const originalFileName = file.name || `document-${Date.now()}.docx`;
+    let jobId: string;
+    try {
+      const result = await pool.query(
+        'INSERT INTO print_jobs (project_id, original_file_url, status, format, font, original_filename) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+        [projectId, originalBlob.url, 'processing', format, fontKey, originalFileName]
+      );
+      jobId = result.rows[0].id;
+    } catch (error) {
+      // If original_filename column doesn't exist, add it and try again
+      if (
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        error.code === '42703'
+      ) {
+        await pool.query(
+          'ALTER TABLE print_jobs ADD COLUMN IF NOT EXISTS original_filename TEXT'
+        );
+        const result = await pool.query(
+          'INSERT INTO print_jobs (project_id, original_file_url, status, format, font, original_filename) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+          [projectId, originalBlob.url, 'processing', format, fontKey, originalFileName]
+        );
+        jobId = result.rows[0].id;
+      } else {
+        throw error;
+      }
+    }
 
     // Convert Docx -> HTML
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -185,6 +208,7 @@ export async function createPrintJob(
     // Generate PDF
     await generateBookPdf(html, jobId, format, fontKey);
 
+    revalidateTag(`project-${projectId}-print-jobs`, 'max');
     revalidatePath(`/dashboard/project/${projectId}`);
     return jobId;
   } catch (error) {
@@ -229,6 +253,7 @@ export async function createPrintJobFromContent(
     // Generate PDF
     await generateBookPdf(html, jobId, format, fontKey);
 
+    revalidateTag(`project-${projectId}-print-jobs`, 'max');
     revalidatePath(`/dashboard/project/${projectId}`);
     return jobId;
   } catch (error) {
@@ -237,13 +262,20 @@ export async function createPrintJobFromContent(
   }
 }
 
-export async function getPrintJobs(projectId: string) {
-  const user = await stackServerApp.getUser();
-  if (!user) return [];
+async function getPrintJobsInternal(projectId: string) {
+  'use cache';
+  cacheTag(`project-${projectId}-print-jobs`);
 
   const result = await pool.query(
     'SELECT * FROM print_jobs WHERE project_id = $1 ORDER BY created_at DESC',
     [projectId]
   );
   return result.rows;
+}
+
+export async function getPrintJobs(projectId: string) {
+  const user = await stackServerApp.getUser();
+  if (!user) return [];
+
+  return getPrintJobsInternal(projectId);
 }

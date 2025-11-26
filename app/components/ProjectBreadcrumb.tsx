@@ -40,31 +40,40 @@ export function ProjectBreadcrumb() {
     return null;
   }
 
-  let breadcrumbItems = pathSegments.map((segment, index) => {
-    let href = '/' + pathSegments.slice(0, index + 1).join('/');
-    const isLast = index === pathSegments.length - 1 && !preview;
-    let label = segment === 'dashboard' 
-      ? 'Dashboard' 
-      : segment === 'project' 
-      ? 'Project' 
-      : segment === 'new'
-      ? 'New Manuscript'
-      : segment;
-    
-    // If this is the "project" segment and we have a project ID, link to the project page
-    if (segment === 'project' && params?.id) {
-      href = `/dashboard/project/${params.id}`;
-    }
-    
-    // Replace project ID with project title if available
-    if (segment === params?.id && projectTitle) {
-      label = projectTitle;
-      // Make sure the href points to the project page
-      href = `/dashboard/project/${segment}`;
-    }
+  let breadcrumbItems = pathSegments
+    .map((segment, index) => {
+      let href = '/' + pathSegments.slice(0, index + 1).join('/');
+      const isLast = index === pathSegments.length - 1 && !preview;
+      let label = segment === 'dashboard' 
+        ? 'Dashboard' 
+        : segment === 'project' 
+        ? 'Project' 
+        : segment === 'new'
+        ? 'New Manuscript'
+        : segment;
+      
+      // If this is the "project" segment and we have a project ID, link to the project page
+      if (segment === 'project' && params?.id) {
+        href = `/dashboard/project/${params.id}`;
+      }
+      
+      // Replace project ID with project title if available
+      if (segment === params?.id && projectTitle) {
+        label = projectTitle;
+        // Make sure the href points to the project page
+        href = `/dashboard/project/${segment}`;
+      }
 
-    return { href, label, isLast, segment };
-  });
+      return { href, label, isLast, segment };
+    })
+    // Filter out project ID segment if title is still loading
+    .filter((item) => {
+      // Don't show the project ID segment if we're still loading the title
+      if (item.segment === params?.id && !projectTitle) {
+        return false;
+      }
+      return true;
+    });
 
   // Add file name to breadcrumb if a file is selected
   if (preview && breadcrumbItems.length > 0) {

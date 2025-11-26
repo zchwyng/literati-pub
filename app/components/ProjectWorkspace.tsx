@@ -168,6 +168,8 @@ export default function ProjectWorkspace({
         setActiveTab('audio');
       } else if (preview.type === 'cover') {
         setActiveTab('cover');
+      } else if (preview.type === 'manuscript') {
+        setActiveTab('edit');
       }
     }
   }, [preview]);
@@ -246,7 +248,8 @@ export default function ProjectWorkspace({
         {isProjectPage && preview && (
           ((activeTab === 'print' || activeTab === 'ebook') && preview.type === 'pdf') ||
           (activeTab === 'audio' && preview.type === 'audio') ||
-          (activeTab === 'cover' && preview.type === 'cover')
+          (activeTab === 'cover' && preview.type === 'cover') ||
+          (activeTab === 'edit' && preview.type === 'manuscript')
         ) ? (
           <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
             <div className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 px-4 py-2">
@@ -377,6 +380,28 @@ export default function ProjectWorkspace({
           </TabsList>
 
           <TabsContent value="edit" className="mt-6">
+            {/* Show selected manuscript indicator */}
+            {preview && preview.type === 'manuscript' && (
+              <div className="mb-4 p-3 rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+                    <span className="text-sm font-medium text-violet-900 dark:text-violet-100">
+                      Selected: {preview.name}
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPreview(null)}
+                    className="h-7 text-xs"
+                  >
+                    <X className="h-3 w-3 mr-1" />
+                    Clear
+                  </Button>
+                </div>
+              </div>
+            )}
             <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-violet-700 to-violet-800 hover:from-violet-700/95 hover:to-violet-800/95 text-left max-w-4xl transition-all">
               <div className="absolute top-4 right-4">
                 <Popover>

@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 type FilePreview = {
-  type: 'pdf' | 'audio' | 'cover';
+  type: 'pdf' | 'audio' | 'cover' | 'manuscript';
   url: string;
   name: string;
   format?: string;

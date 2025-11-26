@@ -163,12 +163,18 @@ export function ProjectRightSidebar() {
     
     const versions = printJobs
       .filter((job: any) => job.original_file_url && typeof job.original_file_url === 'string' && job.original_file_url.trim() !== '')
-      .map((job: any) => ({
-        id: `ms-${job.id}`,
-        url: job.original_file_url,
-        name: `Manuscript ${new Date(job.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`,
-        created_at: job.created_at,
-      }))
+      .map((job: any) => {
+        // Use original filename if available, otherwise fall back to date-based name
+        const fileName = job.original_filename || `Manuscript ${new Date(job.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        return {
+          id: `ms-${job.id}`,
+          url: job.original_file_url,
+          name: fileName,
+          created_at: job.created_at,
+          format: job.format || 'print',
+          font: job.font || 'Default',
+        };
+      })
       // Remove duplicates by URL
       .filter((version, index, self) => 
         index === self.findIndex((v) => v.url === version.url)
@@ -271,18 +277,26 @@ export function ProjectRightSidebar() {
                       <SidebarMenuItem key={version.id}>
                         <SidebarMenuButton
                           onClick={() => {
-                            // For DOCX files, we can't preview in browser, so download or open
-                            const link = document.createElement('a');
-                            link.href = version.url;
-                            link.download = version.name.replace(/\s+/g, '-') + '.docx';
-                            link.target = '_blank';
-                            link.click();
+                            // Set preview to show manuscript in Edit tab
+                            setPreview({
+                              type: 'manuscript',
+                              url: version.url,
+                              name: version.name,
+                              format: version.format,
+                              projectTitle: project?.title,
+                            });
                           }}
+                          isActive={preview?.type === 'manuscript' && preview?.url === version.url}
                           disabled={loading}
                           className="group"
                         >
                           <FileText className="h-4 w-4 shrink-0" />
-                          <span className="truncate">{version.name}</span>
+                          <div className="flex flex-col items-start overflow-hidden">
+                            <span className="truncate font-medium">{version.name}</span>
+                            <span className="text-[10px] text-muted-foreground truncate">
+                              {new Date(version.created_at).toLocaleDateString()} • {version.format === 'ebook' ? 'E-book' : 'Print'} • {version.font || 'Default'}
+                            </span>
+                          </div>
                         </SidebarMenuButton>
                         <DropdownMenu>
                           <SidebarMenuAction asChild showOnHover>
