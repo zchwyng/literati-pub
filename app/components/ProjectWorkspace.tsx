@@ -355,29 +355,7 @@ export default function ProjectWorkspace({
         ) : null}
 
         {/* Production Studio - Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-6">
-          <TabsList className="w-full justify-start">
-            <TabsTrigger value="edit">
-              <FileEdit className="h-4 w-4 mr-2" />
-              Edit
-            </TabsTrigger>
-            <TabsTrigger value="cover">
-              <Palette className="h-4 w-4 mr-2" />
-              Cover
-            </TabsTrigger>
-            <TabsTrigger value="print">
-              <BookOpen className="h-4 w-4 mr-2" />
-              Print
-            </TabsTrigger>
-            <TabsTrigger value="ebook">
-              <Tablet className="h-4 w-4 mr-2" />
-              E-book
-            </TabsTrigger>
-            <TabsTrigger value="audio">
-              <Mic className="h-4 w-4 mr-2" />
-              Audiobook
-            </TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-6 pb-16">
 
           <TabsContent value="edit" className="mt-6">
             {/* Show selected manuscript indicator */}
@@ -1642,6 +1620,29 @@ export default function ProjectWorkspace({
               )}
             </div>
           </TabsContent>
+
+          <TabsList className="sticky bottom-0 left-0 right-0 z-20 mt-8 flex h-16 w-full items-center gap-2 rounded-none border-t border-sidebar-border bg-background px-4">
+            <TabsTrigger value="edit" className="h-12 rounded-xl px-3 text-sm font-semibold">
+              <FileEdit className="h-4 w-4 mr-2" />
+              Edit
+            </TabsTrigger>
+            <TabsTrigger value="cover" className="h-12 rounded-xl px-3 text-sm font-semibold">
+              <Palette className="h-4 w-4 mr-2" />
+              Cover
+            </TabsTrigger>
+            <TabsTrigger value="print" className="h-12 rounded-xl px-3 text-sm font-semibold">
+              <BookOpen className="h-4 w-4 mr-2" />
+              Print
+            </TabsTrigger>
+            <TabsTrigger value="ebook" className="h-12 rounded-xl px-3 text-sm font-semibold">
+              <Tablet className="h-4 w-4 mr-2" />
+              E-book
+            </TabsTrigger>
+            <TabsTrigger value="audio" className="h-12 rounded-xl px-3 text-sm font-semibold">
+              <Mic className="h-4 w-4 mr-2" />
+              Audiobook
+            </TabsTrigger>
+          </TabsList>
         </Tabs>
 
         {/* Empty State - Upload Section */}
