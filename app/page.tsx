@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   FileText,
   Sparkles,
+  ScrollText,
 } from 'lucide-react';
 
 export default async function Home() {
@@ -38,8 +39,8 @@ export default async function Home() {
       {/* Navbar */}
       <nav className="relative z-10 w-full p-6 flex justify-between items-center max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-lg flex items-center justify-center font-bold shadow-sm">
-            L
+          <div className="h-8 w-8 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-lg flex items-center justify-center shadow-sm">
+            <ScrollText className="h-4 w-4" />
           </div>
           <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
             Literati Pub
@@ -65,7 +66,7 @@ export default async function Home() {
               </Button>
               <Button
                 asChild
-                className="rounded-full px-6 shadow-lg hover:shadow-xl transition-all"
+                className="rounded-full px-6 shadow-lg hover:shadow-md transition-all"
               >
                 <Link href="/handler/sign-up">Sign Up</Link>
               </Button>
@@ -274,7 +275,7 @@ function Feature({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-start p-6 rounded-2xl bg-white/50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all">
+    <div className="flex flex-col items-start p-6 rounded-2xl bg-white/50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-sm transition-all">
       <div className="mb-6 p-4 bg-primary/10 rounded-xl">{icon}</div>
       <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3">
         {title}

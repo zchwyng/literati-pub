@@ -52,7 +52,7 @@ export default function LandingUploader() {
         ${
           isProcessing
             ? 'border-border bg-muted/50 opacity-50 cursor-not-allowed'
-            : 'border-border hover:border-primary/50 hover:bg-primary/5 bg-background hover:shadow-lg hover:scale-[1.01]'
+            : 'border-border hover:border-primary/50 hover:bg-primary/5 bg-background hover:shadow-sm hover:scale-[1.01]'
         }
       `}
       >

@@ -47,6 +47,43 @@ export async function getProject(id: string) {
   return result.rows[0];
 }
 
+export async function updateProject(
+  id: string,
+  data: { title?: string; content?: string }
+) {
+  const user = await stackServerApp.getUser();
+  if (!user) throw new Error('Unauthorized');
+
+  const updates: string[] = [];
+  const values: (string | number)[] = [];
+  let paramIndex = 1;
+
+  if (data.title !== undefined) {
+    updates.push(`title = $${paramIndex++}`);
+    values.push(data.title);
+  }
+
+  if (data.content !== undefined) {
+    updates.push(`content = $${paramIndex++}`);
+    values.push(data.content);
+  }
+
+  if (updates.length === 0) {
+    return;
+  }
+
+  values.push(id, user.id);
+  await pool.query(
+    `UPDATE projects SET ${updates.join(
+      ', '
+    )} WHERE id = $${paramIndex++} AND user_id = $${paramIndex}`,
+    values
+  );
+
+  revalidatePath(`/dashboard/project/${id}`);
+  revalidatePath('/dashboard');
+}
+
 export async function deleteProject(id: string) {
   const user = await stackServerApp.getUser();
   if (!user) throw new Error('Unauthorized');

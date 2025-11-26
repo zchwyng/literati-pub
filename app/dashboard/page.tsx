@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { getProjects } from '../actions';
-import { Plus } from 'lucide-react';
+import { Plus, BookOpen } from 'lucide-react';
 import { getBookCoverColor } from '@/lib/utils';
 
 interface Project {
@@ -36,12 +36,12 @@ export default async function Dashboard() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {projects.length === 0 ? (
           <Card className="col-span-full py-24 border-dashed bg-zinc-50/50 dark:bg-zinc-900/20">
             <CardContent className="flex flex-col items-center justify-center text-center">
-              <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6 text-4xl shadow-sm">
-                📚
+              <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                <BookOpen className="h-10 w-10 text-zinc-600 dark:text-zinc-400" />
               </div>
               <h3 className="text-xl font-semibold mb-3 text-zinc-900 dark:text-white">
                 No manuscripts yet
@@ -64,10 +64,10 @@ export default async function Dashboard() {
                 href={`/dashboard/project/${project.id}`}
                 className="group block h-full"
               >
-                <div className="relative h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col">
+                <div className="relative h-full transition-all duration-200 hover:shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col">
                   {/* Book Cover Aspect */}
                   <div
-                    className={`aspect-2/3 w-full ${coverColor} p-6 flex flex-col justify-center items-center text-center relative overflow-hidden`}
+                    className={`aspect-2/3 w-full ${coverColor} p-4 flex flex-col justify-center items-center text-center relative overflow-hidden`}
                   >
                     {/* Spine/Shadow Effects */}
                     <div className="absolute left-0 top-0 bottom-0 w-2 bg-white/10 z-10" />
