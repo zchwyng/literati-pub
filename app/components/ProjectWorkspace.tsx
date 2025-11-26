@@ -355,31 +355,12 @@ export default function ProjectWorkspace({
         ) : null}
 
         {/* Production Studio - Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-6">
-          <TabsList className="w-full justify-start">
-            <TabsTrigger value="edit">
-              <FileEdit className="h-4 w-4 mr-2" />
-              Edit
-            </TabsTrigger>
-            <TabsTrigger value="cover">
-              <Palette className="h-4 w-4 mr-2" />
-              Cover
-            </TabsTrigger>
-            <TabsTrigger value="print">
-              <BookOpen className="h-4 w-4 mr-2" />
-              Print
-            </TabsTrigger>
-            <TabsTrigger value="ebook">
-              <Tablet className="h-4 w-4 mr-2" />
-              E-book
-            </TabsTrigger>
-            <TabsTrigger value="audio">
-              <Mic className="h-4 w-4 mr-2" />
-              Audiobook
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="edit" className="mt-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="mt-6 flex w-full flex-col gap-0"
+        >
+          <TabsContent value="edit" className="flex-1 pt-6">
             {/* Show selected manuscript indicator */}
             {preview && preview.type === 'manuscript' && (
               <div className="mb-4 p-3 rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/50">
@@ -636,7 +617,7 @@ export default function ProjectWorkspace({
             )}
           </TabsContent>
 
-          <TabsContent value="print" className="mt-6">
+          <TabsContent value="print" className="flex-1 pt-6">
             <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-emerald-700 to-emerald-800 hover:from-emerald-700/95 hover:to-emerald-800/95 text-left transition-all group h-full max-w-4xl">
                 <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
                   <Popover>
@@ -791,7 +772,7 @@ export default function ProjectWorkspace({
             )}
           </TabsContent>
 
-          <TabsContent value="ebook" className="mt-6">
+          <TabsContent value="ebook" className="flex-1 pt-6">
             <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-cyan-700 to-cyan-800 hover:from-cyan-700/95 hover:to-cyan-800/95 text-left transition-all group h-full max-w-4xl">
               <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
                 <Popover>
@@ -946,7 +927,7 @@ export default function ProjectWorkspace({
             )}
           </TabsContent>
 
-          <TabsContent value="cover" className="mt-6">
+          <TabsContent value="cover" className="flex-1 pt-6">
             <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-orange-700 to-orange-800 hover:from-orange-700/95 hover:to-orange-800/95 text-left max-w-4xl transition-all">
               <div className="absolute top-4 right-4">
                 <Popover>
@@ -1181,7 +1162,7 @@ export default function ProjectWorkspace({
             )}
           </TabsContent>
 
-          <TabsContent value="audio" className="mt-6">
+          <TabsContent value="audio" className="flex-1 pt-6">
             <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-rose-700 to-rose-800 hover:from-rose-700/95 hover:to-rose-800/95 text-left max-w-4xl transition-all">
               <div className="absolute top-4 right-4">
                 <Popover>
@@ -1361,7 +1342,7 @@ export default function ProjectWorkspace({
             )}
           </TabsContent>
 
-          <TabsContent value="cover" className="mt-6">
+          <TabsContent value="cover" className="flex-1 pt-6">
             <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-orange-700 to-orange-800 hover:from-orange-700/95 hover:to-orange-800/95 text-left max-w-4xl transition-all">
               <div className="absolute top-4 right-4">
                 <Popover>
@@ -1642,6 +1623,43 @@ export default function ProjectWorkspace({
               )}
             </div>
           </TabsContent>
+          <TabsList className="mt-6 w-[100%] rounded-none justify-between gap-3 border-t border-sidebar-border bg-sidebar p-4">
+            <TabsTrigger
+              value="edit"
+              className="flex-1 h-12 justify-center rounded-lg border border-transparent text-sm font-semibold data-[state=active]:border-sidebar-border data-[state=active]:bg-background data-[state=active]:text-foreground"
+            >
+              <FileEdit className="h-4 w-4 mr-2" />
+              Edit
+            </TabsTrigger>
+            <TabsTrigger
+              value="cover"
+              className="flex-1 h-12 justify-center rounded-lg border border-transparent text-sm font-semibold data-[state=active]:border-sidebar-border data-[state=active]:bg-background data-[state=active]:text-foreground"
+            >
+              <Palette className="h-4 w-4 mr-2" />
+              Cover
+            </TabsTrigger>
+            <TabsTrigger
+              value="print"
+              className="flex-1 h-12 justify-center rounded-lg border border-transparent text-sm font-semibold data-[state=active]:border-sidebar-border data-[state=active]:bg-background data-[state=active]:text-foreground"
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              Print
+            </TabsTrigger>
+            <TabsTrigger
+              value="ebook"
+              className="flex-1 h-12 justify-center rounded-lg border border-transparent text-sm font-semibold data-[state=active]:border-sidebar-border data-[state=active]:bg-background data-[state=active]:text-foreground"
+            >
+              <Tablet className="h-4 w-4 mr-2" />
+              E-book
+            </TabsTrigger>
+            <TabsTrigger
+              value="audio"
+              className="flex-1 h-12 justify-center rounded-lg border border-transparent text-sm font-semibold data-[state=active]:border-sidebar-border data-[state=active]:bg-background data-[state=active]:text-foreground"
+            >
+              <Mic className="h-4 w-4 mr-2" />
+              Audiobook
+            </TabsTrigger>
+          </TabsList>
         </Tabs>
 
         {/* Empty State - Upload Section */}
