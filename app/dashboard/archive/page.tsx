@@ -1,11 +1,11 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { getProjects, getAudioGenerations, getCoverGenerations } from '../actions';
-import { getPrintJobs } from '../actions/print';
-import { Plus, BookOpen, FileText } from 'lucide-react';
+import { getProjects, getAudioGenerations, getCoverGenerations } from '../../actions';
+import { getPrintJobs } from '../../actions/print';
+import { Archive, BookOpen, FileText, RotateCcw } from 'lucide-react';
 import { getBookCoverColor } from '@/lib/utils';
-import { PinButton } from '../components/PinButton';
+import { PinButton } from '../../components/PinButton';
 
 interface Project {
   id: string;
@@ -13,6 +13,7 @@ interface Project {
   content: string;
   created_at: string;
   pinned?: boolean;
+  archived?: boolean;
 }
 
 async function getFileCount(projectId: string) {
@@ -44,12 +45,15 @@ async function getFileCount(projectId: string) {
   }
 }
 
-export default async function Dashboard() {
-  const projects = await getProjects();
+export default async function ArchivePage() {
+  const allProjects = await getProjects();
+  
+  // Filter archived projects
+  const archivedProjects = allProjects.filter((project: any) => project.archived === true);
 
-  // Get file counts for all projects
+  // Get file counts for all archived projects
   const projectsWithCounts = await Promise.all(
-    projects.map(async (project) => {
+    archivedProjects.map(async (project) => {
       const fileCount = await getFileCount(project.id);
       return { ...project, fileCount };
     })
@@ -60,38 +64,38 @@ export default async function Dashboard() {
       <div className="flex justify-between items-end mb-10">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white mb-2">
-            Your Projects
+            Archive
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400">
-            Manage your manuscripts and productions
+            Archived projects and manuscripts
           </p>
         </div>
         <Button
           asChild
+          variant="outline"
           className="bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900"
         >
-          <Link href="/dashboard/new">
-            <Plus className="mr-2 h-4 w-4" /> New Manuscript
+          <Link href="/dashboard">
+            <RotateCcw className="mr-2 h-4 w-4" /> Back to Projects
           </Link>
         </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-        {projects.length === 0 ? (
+        {projectsWithCounts.length === 0 ? (
           <Card className="col-span-full py-24 border-dashed bg-zinc-50/50 dark:bg-zinc-900/20">
             <CardContent className="flex flex-col items-center justify-center text-center">
               <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6 shadow-sm">
-                <BookOpen className="h-10 w-10 text-zinc-600 dark:text-zinc-400" />
+                <Archive className="h-10 w-10 text-zinc-600 dark:text-zinc-400" />
               </div>
               <h3 className="text-xl font-semibold mb-3 text-zinc-900 dark:text-white">
-                No manuscripts yet
+                No archived projects
               </h3>
               <p className="text-zinc-500 dark:text-zinc-400 mb-8 max-w-sm leading-relaxed">
-                Start your publishing journey by creating your first project or
-                uploading an existing Word document.
+                Archived projects will appear here. Archive projects you want to keep but don&apos;t need in your main workspace.
               </p>
               <Button asChild size="lg">
-                <Link href="/dashboard/new">Create Project</Link>
+                <Link href="/dashboard">View Active Projects</Link>
               </Button>
             </CardContent>
           </Card>
@@ -104,7 +108,7 @@ export default async function Dashboard() {
                 href={`/dashboard/project/${project.id}`}
                 className="group block h-full"
               >
-                <div className="relative h-full transition-all duration-200 hover:shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col">
+                <div className="relative h-full transition-all duration-200 hover:shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col opacity-75">
                   {/* Book Cover Aspect */}
                   <div
                     className={`aspect-2/3 w-full ${coverColor} p-4 flex flex-col justify-center items-center text-center relative overflow-hidden`}
@@ -164,3 +168,4 @@ export default async function Dashboard() {
     </div>
   );
 }
+

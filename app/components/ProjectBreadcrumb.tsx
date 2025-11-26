@@ -12,10 +12,12 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { getProject } from '../actions';
+import { useFilePreview } from './FilePreviewContext';
 
 export function ProjectBreadcrumb() {
   const pathname = usePathname();
   const params = useParams();
+  const { preview, setPreview } = useFilePreview();
   const [projectTitle, setProjectTitle] = React.useState<string | null>(null);
 
   // Fetch project title if on a project page
@@ -38,9 +40,9 @@ export function ProjectBreadcrumb() {
     return null;
   }
 
-  const breadcrumbItems = pathSegments.map((segment, index) => {
-    const href = '/' + pathSegments.slice(0, index + 1).join('/');
-    const isLast = index === pathSegments.length - 1;
+  let breadcrumbItems = pathSegments.map((segment, index) => {
+    let href = '/' + pathSegments.slice(0, index + 1).join('/');
+    const isLast = index === pathSegments.length - 1 && !preview;
     let label = segment === 'dashboard' 
       ? 'Dashboard' 
       : segment === 'project' 
@@ -49,31 +51,79 @@ export function ProjectBreadcrumb() {
       ? 'New Manuscript'
       : segment;
     
+    // If this is the "project" segment and we have a project ID, link to the project page
+    if (segment === 'project' && params?.id) {
+      href = `/dashboard/project/${params.id}`;
+    }
+    
     // Replace project ID with project title if available
     if (segment === params?.id && projectTitle) {
       label = projectTitle;
+      // Make sure the href points to the project page
+      href = `/dashboard/project/${segment}`;
     }
 
-    return { href, label, isLast };
+    return { href, label, isLast, segment };
   });
+
+  // Add file name to breadcrumb if a file is selected
+  if (preview && breadcrumbItems.length > 0) {
+    breadcrumbItems = [
+      ...breadcrumbItems.map(item => ({ ...item, isLast: false })),
+      {
+        href: '#',
+        label: preview.name,
+        isLast: true,
+      },
+    ];
+  }
+
+  const handleProjectClick = (e: React.MouseEvent, projectId?: string) => {
+    e.preventDefault();
+    setPreview(null);
+    // Navigate to project page if we have a project ID
+    if (projectId) {
+      window.location.href = `/dashboard/project/${projectId}`;
+    } else if (params?.id) {
+      window.location.href = `/dashboard/project/${params.id}`;
+    }
+  };
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        {breadcrumbItems.map((item, index) => (
-          <div key={item.href} className="flex items-center">
-            {index > 0 && <BreadcrumbSeparator />}
-            <BreadcrumbItem>
-              {item.isLast ? (
-                <BreadcrumbPage>{item.label}</BreadcrumbPage>
-              ) : (
-                <BreadcrumbLink asChild>
-                  <Link href={item.href}>{item.label}</Link>
-                </BreadcrumbLink>
-              )}
-            </BreadcrumbItem>
-          </div>
-        ))}
+        {breadcrumbItems.map((item, index) => {
+          // Check if this is the project title item (project ID segment) or the "Project" segment
+          const isProjectTitle = item.segment === params?.id && projectTitle;
+          const isProjectSegment = item.segment === 'project' && params?.id;
+          
+          // Use a unique key combining index and segment to avoid duplicates
+          const uniqueKey = `${index}-${item.segment}-${item.href}`;
+          
+          return (
+            <div key={uniqueKey} className="flex items-center">
+              {index > 0 && <BreadcrumbSeparator />}
+              <BreadcrumbItem>
+                {item.isLast ? (
+                  <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                ) : (isProjectTitle || isProjectSegment) ? (
+                  <BreadcrumbLink asChild>
+                    <Link 
+                      href={item.href}
+                      onClick={(e) => handleProjectClick(e, isProjectTitle ? item.segment : undefined)}
+                    >
+                      {item.label}
+                    </Link>
+                  </BreadcrumbLink>
+                ) : (
+                  <BreadcrumbLink asChild>
+                    <Link href={item.href}>{item.label}</Link>
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+            </div>
+          );
+        })}
       </BreadcrumbList>
     </Breadcrumb>
   );

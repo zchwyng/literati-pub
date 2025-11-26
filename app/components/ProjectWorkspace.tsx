@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import * as React from 'react';
 import Link from 'next/link';
 import { createPrintJob, createPrintJobFromContent } from '../actions/print';
 import { FONTS, type FontKey } from '../lib/print-constants';
@@ -55,7 +56,7 @@ import ProjectActions from './ProjectActions';
 import { useFilePreview } from './FilePreviewContext';
 import { usePathname } from 'next/navigation';
 import mammoth from 'mammoth';
-import { updateProject } from '../actions';
+import { updateProject, generateCoverImage, getCoverGenerations } from '../actions';
 
 interface PrintJob {
   id: string;
@@ -73,6 +74,16 @@ interface AudioGeneration {
   project_id: string;
   audio_url: string;
   created_at: string;
+}
+
+interface CoverGeneration {
+  id: string;
+  project_id: string;
+  cover_url: string;
+  prompt: string;
+  model: string;
+  created_at: string;
+  style?: string;
 }
 
 const FONT_OPTIONS: { key: FontKey; name: string; description: string }[] = [
@@ -112,31 +123,54 @@ interface ProjectWorkspaceProps {
   project: any;
   printJobs: PrintJob[];
   audioGenerations: AudioGeneration[];
+  coverGenerations?: CoverGeneration[];
 }
 
 export default function ProjectWorkspace({
   project,
   printJobs,
   audioGenerations,
+  coverGenerations: initialCoverGenerations = [],
 }: ProjectWorkspaceProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isGeneratingPrint, setIsGeneratingPrint] = useState(false);
   const [isGeneratingEbook, setIsGeneratingEbook] = useState(false);
   const [selectedFont, setSelectedFont] = useState<FontKey>('baskerville');
-  const [activeTab, setActiveTab] = useState('editor');
+  const [activeTab, setActiveTab] = useState('edit');
   const [audioApi, setAudioApi] = useState<'openai' | 'elevenlabs'>('openai');
   const [audioVoice, setAudioVoice] = useState('alloy');
   const [audioStyle, setAudioStyle] = useState('natural');
   const [coverModel, setCoverModel] = useState('nano-banana');
+  const [coverStyle, setCoverStyle] = useState('realistic');
   const [coverPrompt, setCoverPrompt] = useState('');
   const [editorFocus, setEditorFocus] = useState('all');
   const [editorLanguage, setEditorLanguage] = useState('en');
   const [editorDepth, setEditorDepth] = useState('standard');
   const [editorTone, setEditorTone] = useState('professional');
   const [isDragging, setIsDragging] = useState(false);
+  const [isGeneratingCover, setIsGeneratingCover] = useState(false);
+  const [coverGenerations, setCoverGenerations] = useState<CoverGeneration[]>(initialCoverGenerations);
   const { preview, setPreview } = useFilePreview();
   const pathname = usePathname();
   const isProjectPage = pathname?.startsWith('/dashboard/project/');
+
+  // Auto-switch tab when a file is selected
+  React.useEffect(() => {
+    if (preview) {
+      if (preview.type === 'pdf') {
+        // Determine if it's print or ebook based on format
+        if (preview.format === 'ebook') {
+          setActiveTab('ebook');
+        } else {
+          setActiveTab('print');
+        }
+      } else if (preview.type === 'audio') {
+        setActiveTab('audio');
+      } else if (preview.type === 'cover') {
+        setActiveTab('cover');
+      }
+    }
+  }, [preview]);
 
   const handleFileUpload = async (file: File) => {
     if (!file.name.match(/\.(docx|doc)$/i)) {
@@ -210,7 +244,7 @@ export default function ProjectWorkspace({
       <main className="flex-1 w-full space-y-6">
         {/* File Preview - Show on top when preview exists */}
         {isProjectPage && preview && (
-          (activeTab === 'format' && preview.type === 'pdf') ||
+          ((activeTab === 'print' || activeTab === 'ebook') && preview.type === 'pdf') ||
           (activeTab === 'audio' && preview.type === 'audio') ||
           (activeTab === 'cover' && preview.type === 'cover')
         ) ? (
@@ -318,30 +352,267 @@ export default function ProjectWorkspace({
         ) : null}
 
         {/* Production Studio - Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-6">
           <TabsList className="w-full justify-start">
-            <TabsTrigger value="editor">
+            <TabsTrigger value="edit">
               <FileEdit className="h-4 w-4 mr-2" />
-              Editor
-            </TabsTrigger>
-            <TabsTrigger value="format">
-              <FileText className="h-4 w-4 mr-2" />
-              Format
-            </TabsTrigger>
-            <TabsTrigger value="audio">
-              <Mic className="h-4 w-4 mr-2" />
-              Audio
+              Edit
             </TabsTrigger>
             <TabsTrigger value="cover">
               <Palette className="h-4 w-4 mr-2" />
               Cover
             </TabsTrigger>
+            <TabsTrigger value="print">
+              <BookOpen className="h-4 w-4 mr-2" />
+              Print
+            </TabsTrigger>
+            <TabsTrigger value="ebook">
+              <Tablet className="h-4 w-4 mr-2" />
+              E-book
+            </TabsTrigger>
+            <TabsTrigger value="audio">
+              <Mic className="h-4 w-4 mr-2" />
+              Audiobook
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="format" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Print Action */}
-              <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-emerald-700 to-emerald-800 hover:from-emerald-700/95 hover:to-emerald-800/95 text-left transition-all group h-full">
+          <TabsContent value="edit" className="mt-6">
+            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-violet-700 to-violet-800 hover:from-violet-700/95 hover:to-violet-800/95 text-left max-w-4xl transition-all">
+              <div className="absolute top-4 right-4">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
+                    >
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-72">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="editor-focus" className="text-sm font-medium mb-2 block">Focus Area</Label>
+                        <Select value={editorFocus} onValueChange={setEditorFocus}>
+                          <SelectTrigger id="editor-focus" size="sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Areas</SelectItem>
+                            <SelectItem value="dramaturgy">Dramaturgy</SelectItem>
+                            <SelectItem value="style">Style</SelectItem>
+                            <SelectItem value="spelling">Spelling</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground mt-1.5">
+                          Choose what to analyze
+                        </p>
+                      </div>
+                      <div>
+                        <Label htmlFor="editor-language" className="text-sm font-medium mb-2 block">Language</Label>
+                        <Select value={editorLanguage} onValueChange={setEditorLanguage}>
+                          <SelectTrigger id="editor-language" size="sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="en">English</SelectItem>
+                            <SelectItem value="es">Spanish</SelectItem>
+                            <SelectItem value="fr">French</SelectItem>
+                            <SelectItem value="de">German</SelectItem>
+                            <SelectItem value="it">Italian</SelectItem>
+                            <SelectItem value="pt">Portuguese</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground mt-1.5">
+                          Language for analysis
+                        </p>
+                      </div>
+                      <div>
+                        <Label htmlFor="editor-depth" className="text-sm font-medium mb-2 block">Analysis Depth</Label>
+                        <Select value={editorDepth} onValueChange={setEditorDepth}>
+                          <SelectTrigger id="editor-depth" size="sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="quick">Quick</SelectItem>
+                            <SelectItem value="standard">Standard</SelectItem>
+                            <SelectItem value="thorough">Thorough</SelectItem>
+                            <SelectItem value="comprehensive">Comprehensive</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground mt-1.5">
+                          Level of detail in feedback
+                        </p>
+                      </div>
+                      <div>
+                        <Label htmlFor="editor-tone" className="text-sm font-medium mb-2 block">Tone Preference</Label>
+                        <Select value={editorTone} onValueChange={setEditorTone}>
+                          <SelectTrigger id="editor-tone" size="sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="professional">Professional</SelectItem>
+                            <SelectItem value="casual">Casual</SelectItem>
+                            <SelectItem value="academic">Academic</SelectItem>
+                            <SelectItem value="creative">Creative</SelectItem>
+                            <SelectItem value="conversational">Conversational</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground mt-1.5">
+                          Preferred writing tone
+                        </p>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="flex items-start gap-4 mb-5">
+                <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-[1.02]">
+                  <Sparkles className="h-7 w-7 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-xl text-white mb-2">Editor</h3>
+                  <p className="text-sm text-white/90 leading-relaxed">
+                    Get intelligent feedback on dramaturgy, style, and spelling. Improve your manuscript with professional editing insights.
+                  </p>
+                </div>
+              </div>
+              <div className="text-sm text-white/80 mb-5 space-y-2.5">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span>Dramaturgy analysis</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span>Style suggestions</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span>Spelling & grammar check</span>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-white/20 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <button
+                    onClick={() => {
+                      // TODO: Implement dramaturgy analysis
+                      console.log('Dramaturgy analysis clicked');
+                    }}
+                    disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
+                    className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <FileEdit className="h-5 w-5 text-white mb-2" />
+                    <span className="text-xs font-medium text-white">Dramaturgy</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      // TODO: Implement style analysis
+                      console.log('Style analysis clicked');
+                    }}
+                    disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
+                    className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Sparkles className="h-5 w-5 text-white mb-2" />
+                    <span className="text-xs font-medium text-white">Style</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      // TODO: Implement spelling check
+                      console.log('Spelling check clicked');
+                    }}
+                    disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
+                    className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <FileText className="h-5 w-5 text-white mb-2" />
+                    <span className="text-xs font-medium text-white">Spelling</span>
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <p className="text-xs font-medium text-white/70 mb-1">Analysis Type</p>
+                    <p className="text-sm text-white/90">Intelligent</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-white/70 mb-1">Use Case</p>
+                    <p className="text-sm text-white/90">Writing improvement</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-white/70 mb-1">Coverage</p>
+                    <p className="text-sm text-white/90">Full manuscript</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-white/70 mb-1">Language</p>
+                    <p className="text-sm text-white/90">Multiple</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Empty State - Upload Section */}
+            {isProjectPage && !preview && (
+              <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm p-0 mt-6">
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`min-h-[400px] flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg transition-colors ${
+                    isDragging
+                      ? 'border-primary bg-primary/5'
+                      : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-200/80 dark:hover:border-zinc-800/80 hover:bg-zinc-50/30 dark:hover:bg-zinc-900/30'
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-4 text-center max-w-md">
+                    <div className={`p-4 rounded-full transition-colors ${
+                      isDragging
+                        ? 'bg-primary/10'
+                        : 'bg-zinc-100 dark:bg-zinc-800'
+                    }`}>
+                      {isUploading ? (
+                        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                      ) : (
+                        <Upload className={`h-8 w-8 ${
+                          isDragging ? 'text-primary' : 'text-zinc-500'
+                        }`} />
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-lg text-zinc-900 dark:text-white">
+                        {isUploading ? 'Uploading...' : isDragging ? 'Drop your file here' : 'Upload New Version'}
+                      </h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                        {isUploading
+                          ? 'Processing your document...'
+                          : 'Click to select or drag and drop a .docx file to update the manuscript'
+                        }
+                      </p>
+                    </div>
+                    {!isUploading && (
+                      <>
+                        <input
+                          id="file-upload"
+                          type="file"
+                          className="hidden"
+                          accept=".docx,.doc"
+                          onChange={handleFileInput}
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={() => document.getElementById('file-upload')?.click()}
+                          className="mt-2"
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Select Document
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="print" className="mt-6">
+            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-emerald-700 to-emerald-800 hover:from-emerald-700/95 hover:to-emerald-800/95 text-left transition-all group h-full max-w-4xl">
                 <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -431,97 +702,159 @@ export default function ProjectWorkspace({
                   </button>
                 </div>
               </div>
+            
+            {/* Empty State - Upload Section */}
+            {isProjectPage && !preview && (
+              <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm p-0 mt-6">
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`min-h-[400px] flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg transition-colors ${
+                    isDragging
+                      ? 'border-primary bg-primary/5'
+                      : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-200/80 dark:hover:border-zinc-800/80 hover:bg-zinc-50/30 dark:hover:bg-zinc-900/30'
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-4 text-center max-w-md">
+                    <div className={`p-4 rounded-full transition-colors ${
+                      isDragging
+                        ? 'bg-primary/10'
+                        : 'bg-zinc-100 dark:bg-zinc-800'
+                    }`}>
+                      {isUploading ? (
+                        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                      ) : (
+                        <Upload className={`h-8 w-8 ${
+                          isDragging ? 'text-primary' : 'text-zinc-500'
+                        }`} />
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-lg text-zinc-900 dark:text-white">
+                        {isUploading ? 'Uploading...' : isDragging ? 'Drop your file here' : 'Upload New Version'}
+                      </h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                        {isUploading
+                          ? 'Processing your document...'
+                          : 'Click to select or drag and drop a .docx file to update the manuscript'
+                        }
+                      </p>
+                    </div>
+                    {!isUploading && (
+                      <>
+                        <input
+                          id="file-upload"
+                          type="file"
+                          className="hidden"
+                          accept=".docx,.doc"
+                          onChange={handleFileInput}
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={() => document.getElementById('file-upload')?.click()}
+                          className="mt-2"
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Select Document
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            )}
+          </TabsContent>
 
-              {/* eBook Action */}
-              <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-cyan-700 to-cyan-800 hover:from-cyan-700/95 hover:to-cyan-800/95 text-left transition-all group h-full">
-                <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
-                      >
-                        <Settings className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent align="end" className="w-64">
-                      <div className="space-y-4">
-                        <div>
-                          <Label htmlFor="font-select-ebook" className="text-sm font-medium mb-2 block">Typography</Label>
-                          <Select value={selectedFont} onValueChange={(value) => setSelectedFont(value as FontKey)}>
-                            <SelectTrigger id="font-select-ebook" size="sm">
-                              <SelectValue>
-                                {FONT_OPTIONS.find(f => f.key === selectedFont)?.name || selectedFont}
-                              </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                              {FONT_OPTIONS.map((font) => (
-                                <SelectItem key={font.key} value={font.key}>
-                                  <div className="flex flex-col">
-                                    <span>{font.name}</span>
-                                    <span className="text-xs text-muted-foreground">{font.description}</span>
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <p className="text-xs text-muted-foreground mt-1.5">
-                            Choose the font style for your eBook
-                          </p>
-                        </div>
+          <TabsContent value="ebook" className="mt-6">
+            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-cyan-700 to-cyan-800 hover:from-cyan-700/95 hover:to-cyan-800/95 text-left transition-all group h-full max-w-4xl">
+              <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
+                    >
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-64">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="font-select-ebook" className="text-sm font-medium mb-2 block">Typography</Label>
+                        <Select value={selectedFont} onValueChange={(value) => setSelectedFont(value as FontKey)}>
+                          <SelectTrigger id="font-select-ebook" size="sm">
+                            <SelectValue>
+                              {FONT_OPTIONS.find(f => f.key === selectedFont)?.name || selectedFont}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {FONT_OPTIONS.map((font) => (
+                              <SelectItem key={font.key} value={font.key}>
+                                <div className="flex flex-col">
+                                  <span>{font.name}</span>
+                                  <span className="text-xs text-muted-foreground">{font.description}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground mt-1.5">
+                          Choose the font style for your eBook
+                        </p>
                       </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="flex items-start gap-4 mb-5">
-                  <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-[1.02]">
-                    <Tablet className="h-7 w-7 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-xl text-white mb-2">eBook PDF</h3>
-                    <p className="text-sm text-white/90 leading-relaxed">
-                      Digital-first A5 layout optimized for screens. Ideal for e-readers and tablets.
-                    </p>
-                  </div>
-                </div>
-                <div className="text-sm text-white/80 mb-5 space-y-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                    <span>Screen-optimized layout</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                    <span>Reflowable text</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                    <span>E-reader compatible</span>
-                  </div>
-                </div>
-                <div className="mt-auto pt-4 border-t border-white/20">
-                  <div className="space-y-3 mb-4">
-                    <div>
-                      <p className="text-xs font-medium text-white/70 mb-1">Format</p>
-                      <p className="text-sm text-white/90">A5 PDF</p>
                     </div>
-                    <div>
-                      <p className="text-xs font-medium text-white/70 mb-1">Use Case</p>
-                      <p className="text-sm text-white/90">E-readers, tablets, digital distribution</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-white/70 mb-1">Typical Size</p>
-                      <p className="text-sm text-white/90">~1-3 MB per file</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleGenerateFromText('ebook')}
-                    disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
-                    className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white text-sm font-semibold hover:bg-white/25 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isGeneratingEbook ? 'Converting...' : 'Generate eBook'}
-                  </button>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="flex items-start gap-4 mb-5">
+                <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-[1.02]">
+                  <Tablet className="h-7 w-7 text-white" />
                 </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-xl text-white mb-2">E-book PDF</h3>
+                  <p className="text-sm text-white/90 leading-relaxed">
+                    Digital-first A5 layout optimized for screens. Ideal for e-readers and tablets.
+                  </p>
+                </div>
+              </div>
+              <div className="text-sm text-white/80 mb-5 space-y-2.5">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span>Screen-optimized layout</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span>Reflowable text</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span>E-reader compatible</span>
+                </div>
+              </div>
+              <div className="mt-auto pt-4 border-t border-white/20">
+                <div className="space-y-3 mb-4">
+                  <div>
+                    <p className="text-xs font-medium text-white/70 mb-1">Format</p>
+                    <p className="text-sm text-white/90">A5 PDF</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-white/70 mb-1">Use Case</p>
+                    <p className="text-sm text-white/90">E-readers, tablets, digital distribution</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-white/70 mb-1">Typical Size</p>
+                    <p className="text-sm text-white/90">~1-3 MB per file</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleGenerateFromText('ebook')}
+                  disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
+                  className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white text-sm font-semibold hover:bg-white/25 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGeneratingEbook ? 'Converting...' : 'Generate E-book'}
+                </button>
               </div>
             </div>
             
@@ -588,23 +921,23 @@ export default function ProjectWorkspace({
             )}
           </TabsContent>
 
-          <TabsContent value="editor" className="mt-6">
-            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-violet-700 to-violet-800 hover:from-violet-700/95 hover:to-violet-800/95 text-left max-w-4xl transition-all">
+          <TabsContent value="cover" className="mt-6">
+            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-orange-700 to-orange-800 hover:from-orange-700/95 hover:to-orange-800/95 text-left max-w-4xl transition-all">
               <div className="absolute top-4 right-4">
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
+                      className="h-7 w-7 text-white/80 hover:text-white hover:bg-white/20"
                     >
                       <Settings className="h-4 w-4" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent align="end" className="w-72">
+                  <PopoverContent align="end" className="w-64">
                     <div className="space-y-4">
                       <div>
-                        <Label htmlFor="editor-focus" className="text-sm font-medium mb-2 block">Focus Area</Label>
+                        <Label htmlFor="cover-model-select" className="text-sm font-medium mb-2 block">Image Model</Label>
                         <Select value={editorFocus} onValueChange={setEditorFocus}>
                           <SelectTrigger id="editor-focus" size="sm">
                             <SelectValue />
@@ -1035,6 +1368,27 @@ export default function ProjectWorkspace({
                           Choose the generation model for cover creation
                         </p>
                       </div>
+                      <div>
+                        <Label htmlFor="cover-style-select" className="text-sm font-medium mb-2 block">Style</Label>
+                        <Select value={coverStyle} onValueChange={setCoverStyle}>
+                          <SelectTrigger id="cover-style-select" size="sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="realistic">Realistic</SelectItem>
+                            <SelectItem value="illustrated">Illustrated</SelectItem>
+                            <SelectItem value="minimalist">Minimalist</SelectItem>
+                            <SelectItem value="vintage">Vintage</SelectItem>
+                            <SelectItem value="modern">Modern</SelectItem>
+                            <SelectItem value="fantasy">Fantasy</SelectItem>
+                            <SelectItem value="abstract">Abstract</SelectItem>
+                            <SelectItem value="photographic">Photographic</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground mt-1.5">
+                          Choose the visual style for the cover
+                        </p>
+                      </div>
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -1072,7 +1426,7 @@ export default function ProjectWorkspace({
                     value={coverPrompt}
                     onChange={(e) => setCoverPrompt(e.target.value)}
                     placeholder="Describe the cover design you want... (e.g., 'A mysterious forest at twilight with glowing fireflies')"
-                    className="bg-white/20 border-white/30 text-white placeholder:text-white/50 min-h-[80px] resize-none"
+                    className="bg-white/20 border-white/30 text-white placeholder:text-white/50 min-h-[80px] resize-none max-w-2xl"
                     rows={3}
                   />
                 </div>
@@ -1095,81 +1449,237 @@ export default function ProjectWorkspace({
                   </div>
                 </div>
                 <button
-                  onClick={() => {
-                    // TODO: Implement cover design functionality
-                    console.log('Cover design clicked', { model: coverModel, prompt: coverPrompt });
+                  onClick={async () => {
+                    if (!coverPrompt.trim()) {
+                      alert('Please enter a prompt for the cover design');
+                      return;
+                    }
+                    setIsGeneratingCover(true);
+                    try {
+                      // Incorporate style into the prompt
+                      const stylePrefix = coverStyle !== 'realistic' ? `, ${coverStyle} style` : '';
+                      const fullPrompt = `${coverPrompt}${stylePrefix}`;
+                      const coverUrl = await generateCoverImage(project.id, fullPrompt, coverModel);
+                      const newCover: CoverGeneration = {
+                        id: Date.now().toString(),
+                        project_id: project.id,
+                        cover_url: coverUrl,
+                        prompt: coverPrompt,
+                        model: coverModel,
+                        created_at: new Date().toISOString(),
+                        style: coverStyle,
+                      };
+                      setCoverGenerations([newCover, ...coverGenerations]);
+                      setPreview({
+                        url: coverUrl,
+                        type: 'cover',
+                        name: 'Generated Cover',
+                        format: 'image',
+                        projectTitle: project.title,
+                      });
+                    } catch (error) {
+                      console.error('Error generating cover:', error);
+                      alert('Failed to generate cover. Please try again.');
+                    } finally {
+                      setIsGeneratingCover(false);
+                    }
                   }}
-                  disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
+                  disabled={isGeneratingPrint || isGeneratingEbook || isUploading || isGeneratingCover || !coverPrompt.trim()}
                   className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white text-sm font-semibold hover:bg-white/25 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Design Cover
+                  {isGeneratingCover ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    'Design Cover'
+                  )}
                 </button>
               </div>
             </div>
-            
-            {/* Empty State - Upload Section */}
-            {isProjectPage && !preview && (
-              <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm p-0 mt-6">
-                <div
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  className={`min-h-[400px] flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg transition-colors ${
-                    isDragging
-                      ? 'border-primary bg-primary/5'
-                      : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-200/80 dark:hover:border-zinc-800/80 hover:bg-zinc-50/30 dark:hover:bg-zinc-900/30'
-                  }`}
-                >
-                  <div className="flex flex-col items-center gap-4 text-center max-w-md">
-                    <div className={`p-4 rounded-full transition-colors ${
-                      isDragging
-                        ? 'bg-primary/10'
-                        : 'bg-zinc-100 dark:bg-zinc-800'
-                    }`}>
-                      {isUploading ? (
-                        <Loader2 className="h-8 w-8 text-primary animate-spin" />
-                      ) : (
-                        <Upload className={`h-8 w-8 ${
-                          isDragging ? 'text-primary' : 'text-zinc-500'
-                        }`} />
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-lg text-zinc-900 dark:text-white">
-                        {isUploading ? 'Uploading...' : isDragging ? 'Drop your file here' : 'Upload New Version'}
-                      </h3>
-                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                        {isUploading
-                          ? 'Processing your document...'
-                          : 'Click to select or drag and drop a .docx file to update the manuscript'
-                        }
-                      </p>
-                    </div>
-                    {!isUploading && (
-                      <>
-                        <input
-                          id="file-upload"
-                          type="file"
-                          className="hidden"
-                          accept=".docx,.doc"
-                          onChange={handleFileInput}
-                        />
-                        <Button
-                          variant="outline"
-                          onClick={() => document.getElementById('file-upload')?.click()}
-                          className="mt-2"
+
+            {/* Cover Gallery - Show template covers or generated covers */}
+            <div className="mt-6">
+              {coverGenerations.length === 0 ? (
+                <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
+                  <CardHeader>
+                    <CardTitle>Template Covers</CardTitle>
+                    <CardDescription>
+                      Browse template covers or generate a custom one using the prompt above
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {[
+                        { id: '1', title: 'Minimalist', description: 'Clean and simple design' },
+                        { id: '2', title: 'Abstract', description: 'Modern abstract art' },
+                        { id: '3', title: 'Nature', description: 'Natural landscapes' },
+                        { id: '4', title: 'Urban', description: 'Cityscapes and architecture' },
+                        { id: '5', title: 'Fantasy', description: 'Mystical and magical' },
+                        { id: '6', title: 'Vintage', description: 'Classic retro style' },
+                        { id: '7', title: 'Geometric', description: 'Bold shapes and patterns' },
+                        { id: '8', title: 'Photographic', description: 'Real photography' },
+                      ].map((template) => (
+                        <div
+                          key={template.id}
+                          className="group relative aspect-[2/3] rounded-lg border-2 border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer overflow-hidden"
+                          onClick={() => {
+                            // For templates, we could show a preview or use them as inspiration
+                            // For now, just show a placeholder
+                          }}
                         >
-                          <Upload className="h-4 w-4 mr-2" />
-                          Select Document
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            )}
+                          <div className="absolute inset-0 flex items-center justify-center p-4">
+                            <div className="text-center">
+                              <Palette className="h-8 w-8 mx-auto mb-2 text-zinc-400 dark:text-zinc-600" />
+                              <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{template.title}</p>
+                            </div>
+                          </div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="absolute bottom-0 left-0 right-0 p-3">
+                              <p className="text-xs text-white font-medium">{template.title}</p>
+                              <p className="text-xs text-white/80">{template.description}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
+                  <CardHeader>
+                    <CardTitle>Generated Covers</CardTitle>
+                    <CardDescription>
+                      Your generated cover designs
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {coverGenerations.map((cover) => (
+                        <div
+                          key={cover.id}
+                          className="group relative aspect-[2/3] rounded-lg border-2 border-zinc-200 dark:border-zinc-800 overflow-hidden hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer"
+                          onClick={() => {
+                            setPreview({
+                              url: cover.cover_url,
+                              type: 'cover',
+                              name: 'Generated Cover',
+                              format: 'image',
+                              projectTitle: project.title,
+                            });
+                          }}
+                        >
+                          <img
+                            src={cover.cover_url}
+                            alt={cover.prompt || 'Generated cover'}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="absolute bottom-0 left-0 right-0 p-3">
+                              <p className="text-xs text-white font-medium line-clamp-2">{cover.prompt}</p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  className="h-6 text-xs"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(cover.cover_url, '_blank');
+                                  }}
+                                >
+                                  <ExternalLink className="h-3 w-3 mr-1" />
+                                  Open
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="secondary"
+                                  className="h-6 text-xs"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const link = document.createElement('a');
+                                    link.href = cover.cover_url;
+                                    link.download = `cover-${cover.id}.png`;
+                                    link.click();
+                                  }}
+                                >
+                                  <Download className="h-3 w-3 mr-1" />
+                                  Download
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </TabsContent>
         </Tabs>
+
+        {/* Empty State - Upload Section */}
+        {isProjectPage && !preview && activeTab !== 'cover' && (
+          <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm p-0 mt-6">
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`min-h-[400px] flex flex-col items-center justify-center p-8 border border-dashed rounded-lg transition-colors ${
+                isDragging
+                  ? 'border-primary/50 bg-primary/5'
+                  : 'border-zinc-200/50 dark:border-zinc-800/50 hover:border-zinc-200/60 dark:hover:border-zinc-800/60 hover:bg-zinc-50/30 dark:hover:bg-zinc-900/30'
+              }`}
+            >
+              <div className="flex flex-col items-center gap-4 text-center max-w-md">
+                <div className={`p-4 rounded-full transition-colors ${
+                  isDragging
+                    ? 'bg-primary/10'
+                    : 'bg-zinc-100 dark:bg-zinc-800'
+                }`}>
+                  {isUploading ? (
+                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                  ) : (
+                    <Upload className={`h-8 w-8 ${
+                      isDragging ? 'text-primary' : 'text-zinc-500'
+                    }`} />
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-semibold text-lg text-zinc-900 dark:text-white">
+                    {isUploading ? 'Uploading...' : isDragging ? 'Drop your file here' : 'Upload New Version'}
+                  </h3>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    {isUploading
+                      ? 'Processing your document...'
+                      : 'Click to select or drag and drop a .docx file to update the manuscript'
+                    }
+                  </p>
+                </div>
+                {!isUploading && (
+                  <>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      className="hidden"
+                      accept=".docx,.doc"
+                      onChange={handleFileInput}
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => document.getElementById('file-upload')?.click()}
+                      className="mt-2"
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Select Document
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </Card>
+        )}
 
       </main>
 

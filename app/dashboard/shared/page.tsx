@@ -1,0 +1,119 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { BookOpen, User, Calendar, ExternalLink } from 'lucide-react';
+import { getBookCoverColor } from '@/lib/utils';
+
+export default async function SharedPage() {
+  // This would normally fetch shared projects from the database
+  const sharedProjects: any[] = [];
+
+  return (
+    <div className="p-8 max-w-7xl mx-auto">
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white mb-2">
+          Shared with Me
+        </h1>
+        <p className="text-zinc-500 dark:text-zinc-400">
+          Projects that others have shared with you
+        </p>
+      </div>
+
+      {sharedProjects.length === 0 ? (
+        <Card className="py-24 border-dashed bg-zinc-50/50 dark:bg-zinc-900/20">
+          <CardContent className="flex flex-col items-center justify-center text-center">
+            <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6 shadow-sm">
+              <BookOpen className="h-10 w-10 text-zinc-600 dark:text-zinc-400" />
+            </div>
+            <h3 className="text-xl font-semibold mb-3 text-zinc-900 dark:text-white">
+              No shared projects yet
+            </h3>
+            <p className="text-zinc-500 dark:text-zinc-400 mb-8 max-w-sm leading-relaxed">
+              When someone shares a project with you, it will appear here. You can view, comment, and collaborate on shared projects.
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {sharedProjects.map((project) => {
+            const coverColor = getBookCoverColor(project.title);
+            return (
+              <Link
+                key={project.id}
+                href={`/dashboard/project/${project.id}`}
+                className="group block h-full"
+              >
+                <div className="relative h-full transition-all duration-200 hover:shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col">
+                  <div
+                    className={`aspect-2/3 w-full ${coverColor} p-4 flex flex-col justify-center items-center text-center relative overflow-hidden`}
+                  >
+                    <div className="absolute left-0 top-0 bottom-0 w-2 bg-white/10 z-10" />
+                    <div className="absolute left-2 top-0 bottom-0 w-1 bg-black/5 z-10" />
+                    <h3 className="font-serif font-bold text-xl text-white/95 drop-shadow-md line-clamp-3 tracking-wide leading-tight">
+                      {project.title}
+                    </h3>
+                    <div className="absolute inset-0 bg-linear-to-tr from-black/20 to-white/10 pointer-events-none" />
+                  </div>
+                  <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 flex-1 flex flex-col bg-white dark:bg-zinc-900">
+                    <div className="mb-3">
+                      <h4 className="font-medium text-zinc-900 dark:text-zinc-100 truncate group-hover:text-blue-600 transition-colors">
+                        {project.title}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                        <User className="h-3 w-3" />
+                        <span className="truncate">{project.sharedBy}</span>
+                      </div>
+                    </div>
+                    <div className="mt-auto flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(project.sharedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>About Sharing</CardTitle>
+          <CardDescription>
+            How project sharing works
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              When someone shares a project with you, you'll receive access based on the permissions they grant. You can view, comment, or edit depending on your role.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 border rounded-lg">
+                <p className="font-medium mb-2">View Only</p>
+                <p className="text-sm text-zinc-500">
+                  You can read and preview the project, but cannot make changes
+                </p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <p className="font-medium mb-2">Can Comment</p>
+                <p className="text-sm text-zinc-500">
+                  You can leave feedback and suggestions on the manuscript
+                </p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <p className="font-medium mb-2">Can Edit</p>
+                <p className="text-sm text-zinc-500">
+                  You have full editing access to make changes to the project
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+

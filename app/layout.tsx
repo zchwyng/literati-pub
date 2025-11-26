@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { StackProvider, StackTheme } from '@stackframe/stack';
 import { stackServerApp } from '../stack';
 import { ThemeProvider } from './components/ThemeProvider';
+import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 
 const geistSans = Geist({
@@ -43,6 +44,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <NextTopLoader
+          color="#10b981"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #10b981,0 0 5px #10b981"
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

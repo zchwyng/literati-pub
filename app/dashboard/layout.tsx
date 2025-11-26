@@ -28,8 +28,8 @@ export default function DashboardLayout({
                 <div className="mr-2 h-4 w-px bg-zinc-200 dark:bg-zinc-800" />
                 <ProjectBreadcrumb />
                 <div className="ml-auto flex items-center gap-2">
-                  {isProjectPage && <RightSidebarTrigger />}
                   <ThemeToggle />
+                  {isProjectPage && <RightSidebarTrigger />}
                 </div>
               </header>
               <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

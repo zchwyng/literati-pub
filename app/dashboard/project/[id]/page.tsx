@@ -1,5 +1,9 @@
 import { notFound } from 'next/navigation';
-import { getProject, getAudioGenerations } from '../../../actions';
+import {
+  getProject,
+  getAudioGenerations,
+  getCoverGenerations,
+} from '../../../actions';
 import { getPrintJobs } from '../../../actions/print';
 import ProjectWorkspace from '../../../components/ProjectWorkspace';
 
@@ -15,9 +19,10 @@ export default async function ProjectPage({ params }: Props) {
     notFound();
   }
 
-  const [audioGenerations, printJobs] = await Promise.all([
+  const [audioGenerations, printJobs, coverGenerations] = await Promise.all([
     getAudioGenerations(id),
     getPrintJobs(id),
+    getCoverGenerations(id),
   ]);
 
   return (
@@ -25,6 +30,7 @@ export default async function ProjectPage({ params }: Props) {
       project={project}
       printJobs={printJobs}
       audioGenerations={audioGenerations}
+      coverGenerations={coverGenerations}
     />
   );
 }

@@ -29,11 +29,28 @@ export async function getProjects() {
   const user = await stackServerApp.getUser();
   if (!user) return [];
 
-  const result = await pool.query(
-    'SELECT * FROM projects WHERE user_id = $1 ORDER BY created_at DESC',
-    [user.id]
-  );
-  return result.rows;
+  try {
+    const result = await pool.query(
+      'SELECT * FROM projects WHERE user_id = $1 AND COALESCE(archived, false) = false ORDER BY COALESCE(pinned, false) DESC, created_at DESC',
+      [user.id]
+    );
+    return result.rows;
+  } catch (error) {
+    // If pinned or archived column doesn't exist yet, fall back to simple query
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === '42703'
+    ) {
+      const result = await pool.query(
+        'SELECT * FROM projects WHERE user_id = $1 ORDER BY created_at DESC',
+        [user.id]
+      );
+      return result.rows;
+    }
+    throw error;
+  }
 }
 
 export async function getProject(id: string) {
@@ -93,6 +110,86 @@ export async function deleteProject(id: string) {
     user.id,
   ]);
   revalidatePath('/dashboard');
+}
+
+export async function togglePinProject(id: string) {
+  const user = await stackServerApp.getUser();
+  if (!user) throw new Error('Unauthorized');
+
+  // First get current pinned status
+  const project = await getProject(id);
+  if (!project) throw new Error('Project not found');
+
+  const newPinnedStatus = !(project.pinned ?? false);
+
+  try {
+    await pool.query(
+      'UPDATE projects SET pinned = $1 WHERE id = $2 AND user_id = $3',
+      [newPinnedStatus, id, user.id]
+    );
+  } catch (error: any) {
+    // If pinned column doesn't exist, we need to add it first
+    if (error?.code === '42703') {
+      // Add the column if it doesn't exist
+      await pool.query(
+        'ALTER TABLE projects ADD COLUMN IF NOT EXISTS pinned BOOLEAN DEFAULT false'
+      );
+      // Try again
+      await pool.query(
+        'UPDATE projects SET pinned = $1 WHERE id = $2 AND user_id = $3',
+        [newPinnedStatus, id, user.id]
+      );
+    } else {
+      throw error;
+    }
+  }
+
+  revalidatePath('/dashboard');
+  revalidatePath(`/dashboard/project/${id}`);
+  return newPinnedStatus;
+}
+
+export async function toggleArchiveProject(id: string) {
+  const user = await stackServerApp.getUser();
+  if (!user) throw new Error('Unauthorized');
+
+  // First get current archived status
+  const project = await getProject(id);
+  if (!project) throw new Error('Project not found');
+
+  const newArchivedStatus = !(project.archived ?? false);
+
+  try {
+    await pool.query(
+      'UPDATE projects SET archived = $1 WHERE id = $2 AND user_id = $3',
+      [newArchivedStatus, id, user.id]
+    );
+  } catch (error) {
+    // If archived column doesn't exist, we need to add it first
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === '42703'
+    ) {
+      // Add the column if it doesn't exist
+      await pool.query(
+        'ALTER TABLE projects ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT false'
+      );
+      // Try again
+      await pool.query(
+        'UPDATE projects SET archived = $1 WHERE id = $2 AND user_id = $3',
+        [newArchivedStatus, id, user.id]
+      );
+    } else {
+      throw error;
+    }
+  }
+
+  revalidatePath('/dashboard');
+  revalidatePath('/dashboard/archive');
+  revalidatePath(`/dashboard/project/${id}`);
+  return newArchivedStatus;
 }
 
 // --- TTS & Audio ---
@@ -158,8 +255,109 @@ export async function generateTtsForProject(projectId: string) {
   }
 }
 
+// --- Cover Image Generation ---
+
+export async function generateCoverImage(
+  projectId: string,
+  prompt: string,
+  model: string = 'dalle-3'
+) {
+  const user = await stackServerApp.getUser();
+  if (!user) throw new Error('Unauthorized');
+
+  const project = await getProject(projectId);
+  if (!project) throw new Error('Project not found');
+
+  if (!prompt || prompt.trim().length === 0) {
+    throw new Error('Prompt is required');
+  }
+
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+
+  try {
+    // Generate image with DALL-E 3
+    const response = await openai.images.generate({
+      model: model === 'dalle-3' ? 'dall-e-3' : 'dall-e-2',
+      prompt: `Professional book cover design: ${prompt}. High quality, detailed, book cover illustration.`,
+      n: 1,
+      size: model === 'dalle-3' ? '1024x1024' : '1024x1024',
+      quality: 'standard',
+    });
+
+    if (
+      !response.data ||
+      response.data.length === 0 ||
+      !response.data[0]?.url
+    ) {
+      throw new Error('No image URL returned from OpenAI');
+    }
+    const imageUrl = response.data[0].url;
+
+    // Download the image
+    const imageResponse = await fetch(imageUrl);
+    const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+
+    // Upload to Blob
+    const filename = `cover-${projectId}-${Date.now()}.png`;
+    const blob = await put(filename, imageBuffer, {
+      access: 'public',
+      contentType: 'image/png',
+    });
+
+    // Save to database (we'll need to create a covers table or add to projects)
+    // For now, let's store it in a covers table
+    try {
+      await pool.query(
+        `CREATE TABLE IF NOT EXISTS cover_generations (
+          id SERIAL PRIMARY KEY,
+          project_id VARCHAR(255) NOT NULL,
+          cover_url TEXT NOT NULL,
+          prompt TEXT,
+          model VARCHAR(50),
+          created_at TIMESTAMP DEFAULT NOW()
+        )`
+      );
+
+      await pool.query(
+        'INSERT INTO cover_generations (project_id, cover_url, prompt, model) VALUES ($1, $2, $3, $4)',
+        [projectId, blob.url, prompt, model]
+      );
+    } catch (dbError) {
+      console.error('Error saving cover to database:', dbError);
+      // Continue even if DB save fails
+    }
+
+    revalidatePath(`/dashboard/project/${projectId}`);
+    return blob.url;
+  } catch (error) {
+    console.error('Error generating cover image:', error);
+    throw new Error('Failed to generate cover image');
+  }
+}
+
+export async function getCoverGenerations(projectId: string) {
+  const user = await stackServerApp.getUser();
+  if (!user) return [];
+
+  const project = await getProject(projectId);
+  if (!project) return [];
+
+  try {
+    const result = await pool.query(
+      'SELECT * FROM cover_generations WHERE project_id = $1 ORDER BY created_at DESC',
+      [projectId]
+    );
+    return result.rows;
+  } catch {
+    // Table might not exist yet
+    return [];
+  }
+}
+
 // Legacy/Simple Action (Optional, kept for reference or quick testing)
-export async function generateTtsFromText(text: string) {
+export async function generateTtsFromText(_text: string) {
   // ... implementation ...
   // For now I'll remove it or comment it out to force usage of the robust flow
   // or just leave it for the landing page demo if we want a "try it out" feature without login.

@@ -28,7 +28,7 @@ export default async function Home() {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60 dark:opacity-20 grayscale-20"
           style={{
             backgroundImage:
-              'url(https://images.pexels.com/photos/3747463/pexels-photo-3747463.jpeg?auto=compress&cs=tinysrgb&w=1920)',
+              'url(https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=80&auto=format&fit=crop)',
           }}
         />
 
@@ -136,16 +136,19 @@ export default async function Home() {
               number="1"
               title="Upload Your Manuscript"
               description="Simply drag and drop your Word document (.docx). Our system instantly extracts your text and prepares it for processing. No formatting required—we handle everything."
+              image="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80&auto=format&fit=crop"
             />
             <Step
               number="2"
               title="Generate & Customize"
               description="Create your audiobook narration with AI voices that capture emotion and nuance. Format your print-ready PDF with professional typesetting. Preview and adjust as needed."
+              image="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80&auto=format&fit=crop"
             />
             <Step
               number="3"
               title="Export & Publish"
               description="Download industry-standard files ready for Amazon KDP, IngramSpark, Audible, and ACX. All files meet platform requirements—no rejections, no headaches."
+              image="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=800&q=80&auto=format&fit=crop"
             />
           </div>
         </div>
@@ -169,31 +172,37 @@ export default async function Home() {
               title="Cinema-Grade AI Narration"
               description="Generate emotive, human-like narration for your audiobook using the latest neural voice models. Our AI captures the subtle nuances of your prose—pauses, emphasis, and emotional tone. Listen and export instantly in high-quality audio formats."
               icon={<Headphones className="h-8 w-8 text-primary" />}
+              image="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=600&q=80&auto=format&fit=crop"
             />
             <Feature
               title="Instant Professional Typesetting"
               description="Forget about margins, bleed, and page breaks. We automatically format your Word document into a professional 6x9″ novel PDF ready for print. Includes proper chapter breaks, page numbering, and industry-standard typography."
               icon={<Printer className="h-8 w-8 text-primary" />}
+              image="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80&auto=format&fit=crop"
             />
             <Feature
               title="Global Distribution Ready"
               description="Export compliant files for Amazon KDP, IngramSpark, Audible, and ACX. All formats meet strict platform requirements—no rejection headaches, no last-minute fixes. Your files are ready to upload and publish immediately."
               icon={<BookOpen className="h-8 w-8 text-primary" />}
+              image="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&q=80&auto=format&fit=crop"
             />
             <Feature
               title="Lightning Fast Processing"
               description="What used to take days or weeks now happens in minutes. Upload your manuscript and get both audiobook and print-ready formats simultaneously. No waiting, no delays—just fast, professional results."
               icon={<Zap className="h-8 w-8 text-primary" />}
+              image="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&q=80&auto=format&fit=crop"
             />
             <Feature
               title="No Technical Skills Required"
               description="You don't need to learn InDesign, understand print specifications, or master audio editing software. Our platform handles all the technical complexity so you can focus on what matters: your story."
               icon={<Sparkles className="h-8 w-8 text-primary" />}
+              image="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&q=80&auto=format&fit=crop"
             />
             <Feature
               title="Multiple Format Support"
               description="Export in all the formats you need: MP3 for audiobooks, PDF for print-on-demand, and more. Each format is optimized for its platform, ensuring the best quality and compatibility."
               icon={<FileText className="h-8 w-8 text-primary" />}
+              image="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=600&q=80&auto=format&fit=crop"
             />
           </div>
         </div>
@@ -269,13 +278,25 @@ function Feature({
   title,
   description,
   icon,
+  image,
 }: {
   title: string;
   description: string;
   icon: React.ReactNode;
+  image?: string;
 }) {
   return (
-    <div className="flex flex-col items-start p-6 rounded-2xl bg-white/50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-sm transition-all">
+    <div className="flex flex-col items-start p-6 rounded-2xl bg-white/50 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-sm transition-all overflow-hidden">
+      {image && (
+        <div className="w-full h-48 -m-6 mb-4 relative overflow-hidden">
+          <img
+            src={image}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-white/50 dark:from-zinc-900/50 to-transparent" />
+        </div>
+      )}
       <div className="mb-6 p-4 bg-primary/10 rounded-xl">{icon}</div>
       <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3">
         {title}
@@ -291,16 +312,33 @@ function Step({
   number,
   title,
   description,
+  image,
 }: {
   number: string;
   title: string;
   description: string;
+  image?: string;
 }) {
   return (
     <div className="flex flex-col items-center text-center p-6">
-      <div className="mb-6 w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-        {number}
-      </div>
+      {image && (
+        <div className="mb-6 w-full h-48 rounded-xl overflow-hidden relative">
+          <img
+            src={image}
+            alt={title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
+          <div className="absolute top-4 right-4 w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white text-xl font-bold shadow-lg">
+            {number}
+          </div>
+        </div>
+      )}
+      {!image && (
+        <div className="mb-6 w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+          {number}
+        </div>
+      )}
       <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3">
         {title}
       </h3>

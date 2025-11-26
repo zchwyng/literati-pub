@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from "react"
-import { ScrollText, Plus, LayoutDashboard, FileText, BookOpen, BarChart3, Users, Settings, HelpCircle, Library, Share2, Globe, TrendingUp, FileCheck, Sparkles, Zap } from "lucide-react"
+import { ScrollText, Plus, LayoutDashboard, FileText, BookOpen, BarChart3, Users, Settings, HelpCircle, Library, Share2, Globe, TrendingUp, FileCheck, Sparkles, Zap, Notebook, MessageSquare, Archive } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { UserButton } from "@stackframe/stack"
@@ -64,6 +64,16 @@ export function DashboardSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Projects</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/dashboard/new"}>
                   <Link href="/dashboard/new">
@@ -72,16 +82,6 @@ export function DashboardSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarSeparator />
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Manuscripts</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
               {loading ? (
                 <SidebarMenuItem>
                   <div className="px-2 py-2 text-xs text-muted-foreground">
@@ -102,7 +102,7 @@ export function DashboardSidebar() {
                       isActive={pathname === `/dashboard/project/${project.id}`}
                     >
                       <Link href={`/dashboard/project/${project.id}`}>
-                        <FileText className="mr-2 h-4 w-4" />
+                        <Notebook className="mr-2 h-4 w-4" />
                         <span className="truncate">{project.title}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -177,6 +177,14 @@ export function DashboardSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/feedback"}>
+                  <Link href="/dashboard/feedback">
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    <span>Feedback</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -213,6 +221,14 @@ export function DashboardSidebar() {
           <SidebarGroupLabel>Settings</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard/archive"}>
+                  <Link href="/dashboard/archive">
+                    <Archive className="mr-2 h-4 w-4" />
+                    <span>Archive</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/dashboard/settings"}>
                   <Link href="/dashboard/settings">

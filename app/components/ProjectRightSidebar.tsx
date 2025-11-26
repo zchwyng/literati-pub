@@ -19,21 +19,32 @@ import {
 } from '@/components/ui/sidebar';
 import {
   Download,
-  RefreshCw,
   ExternalLink,
   FileText,
   MoreHorizontal,
+  Mic,
+  File,
+  Palette,
+  Loader2,
+  BookOpen,
+  Tablet,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
-import { getAudioGenerations, getProject } from '../actions';
+import { getAudioGenerations, getProject, getCoverGenerations } from '../actions';
 import { getPrintJobs } from '../actions/print';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { useFilePreview } from './FilePreviewContext';
 
@@ -122,20 +133,48 @@ export function ProjectRightSidebar() {
 
   const [audioFiles, setAudioFiles] = React.useState<any[]>([]);
   const [printJobs, setPrintJobs] = React.useState<any[]>([]);
+  const [coverGenerations, setCoverGenerations] = React.useState<any[]>([]);
   const [project, setProject] = React.useState<any>(null);
   const [loading, setLoading] = React.useState(false);
+  const [showAllPrint, setShowAllPrint] = React.useState(false);
+  const [showAllEbook, setShowAllEbook] = React.useState(false);
+  const [manuscriptVersionsOpen, setManuscriptVersionsOpen] = React.useState(false);
+  const [coversOpen, setCoversOpen] = React.useState(false);
+  const [audiobookOpen, setAudiobookOpen] = React.useState(false);
+  const [printOpen, setPrintOpen] = React.useState(false);
+  const [ebookOpen, setEbookOpen] = React.useState(false);
+
+  // Extract unique manuscript versions from print jobs
+  const manuscriptVersions = React.useMemo(() => {
+    const versions = printJobs
+      .filter((job: any) => job.original_file_url && job.original_file_url.trim() !== '')
+      .map((job: any) => ({
+        id: `ms-${job.id}`,
+        url: job.original_file_url,
+        name: `Manuscript ${new Date(job.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`,
+        created_at: job.created_at,
+      }))
+      // Remove duplicates by URL
+      .filter((version, index, self) => 
+        index === self.findIndex((v) => v.url === version.url)
+      )
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    return versions;
+  }, [printJobs]);
 
   const fetchFiles = React.useCallback(async () => {
     if (!projectId) return;
     setLoading(true);
     try {
-      const [audio, print, projectData] = await Promise.all([
+      const [audio, print, covers, projectData] = await Promise.all([
         getAudioGenerations(projectId),
         getPrintJobs(projectId),
+        getCoverGenerations(projectId),
         getProject(projectId),
       ]);
       setAudioFiles(audio);
       setPrintJobs(print);
+      setCoverGenerations(covers);
       setProject(projectData);
     } catch (error) {
       console.error('Failed to fetch files', error);
@@ -193,31 +232,188 @@ export function ProjectRightSidebar() {
           className="bg-sidebar flex h-full w-full flex-col overflow-hidden"
         >
           <SidebarHeader className="h-16 border-b border-sidebar-border flex flex-row items-center justify-between px-4">
-            <span className="text-sm font-semibold">Generated Files</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={fetchFiles}
-              disabled={loading}
-              className="h-8 w-8"
-            >
-              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
-              <span className="sr-only">Refresh files</span>
-            </Button>
+            <span className="text-sm font-semibold">Binder</span>
           </SidebarHeader>
           <SidebarContent className="flex-1 overflow-auto">
+            {/* Manuscript Versions - Moved to top */}
+            <Collapsible 
+              open={manuscriptVersionsOpen} 
+              onOpenChange={setManuscriptVersionsOpen}
+              defaultOpen={manuscriptVersions.length > 0}
+            >
+              <SidebarGroup>
+                <CollapsibleTrigger asChild>
+                  <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50">
+                    <ChevronDown className={`h-3 w-3 transition-transform ${manuscriptVersionsOpen ? 'rotate-0' : '-rotate-90'}`} />
+                    Manuscript Versions
+                  </SidebarGroupLabel>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {manuscriptVersions.length === 0 ? null : (
+                    manuscriptVersions.map((version: any) => (
+                      <SidebarMenuItem key={version.id}>
+                        <SidebarMenuButton
+                          onClick={() => {
+                            // For DOCX files, we can't preview in browser, so download or open
+                            const link = document.createElement('a');
+                            link.href = version.url;
+                            link.download = version.name.replace(/\s+/g, '-') + '.docx';
+                            link.target = '_blank';
+                            link.click();
+                          }}
+                          className="group"
+                        >
+                          <FileText className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{version.name}</span>
+                        </SidebarMenuButton>
+                        <DropdownMenu>
+                          <SidebarMenuAction asChild showOnHover>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">More options</span>
+                              </button>
+                            </DropdownMenuTrigger>
+                          </SidebarMenuAction>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(version.url, '_blank');
+                              }}
+                            >
+                              <ExternalLink className="mr-2 h-4 w-4" />
+                              Open in new tab
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const link = document.createElement('a');
+                                link.href = version.url;
+                                link.download = version.name.replace(/\s+/g, '-') + '.docx';
+                                link.click();
+                              }}
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Download
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </SidebarMenuItem>
+                    ))
+                      )}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </Collapsible>
+
+            <SidebarSeparator />
+
+            {/* Covers */}
+            <Collapsible 
+              open={coversOpen} 
+              onOpenChange={setCoversOpen}
+              defaultOpen={coverGenerations.length > 0}
+            >
+              <SidebarGroup>
+                <CollapsibleTrigger asChild>
+                  <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50">
+                    <ChevronDown className={`h-3 w-3 transition-transform ${coversOpen ? 'rotate-0' : '-rotate-90'}`} />
+                    Covers
+                  </SidebarGroupLabel>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {coverGenerations.length === 0 ? null : (
+                    coverGenerations.map((cover: any) => (
+                      <SidebarMenuItem key={cover.id}>
+                        <SidebarMenuButton
+                          onClick={() => {
+                            setPreview({
+                              type: 'cover',
+                              url: cover.cover_url,
+                              name: cover.prompt || 'Generated Cover',
+                              format: 'image',
+                              projectTitle: project?.title,
+                            });
+                          }}
+                          isActive={preview?.type === 'cover' && preview?.url === cover.cover_url}
+                          className="group"
+                        >
+                          <Palette className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{cover.prompt || 'Cover'}</span>
+                        </SidebarMenuButton>
+                        <DropdownMenu>
+                          <SidebarMenuAction asChild showOnHover>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">More options</span>
+                              </button>
+                            </DropdownMenuTrigger>
+                          </SidebarMenuAction>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(cover.cover_url, '_blank');
+                              }}
+                            >
+                              <ExternalLink className="mr-2 h-4 w-4" />
+                              Open in new tab
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const link = document.createElement('a');
+                                link.href = cover.cover_url;
+                                link.download = `cover-${cover.id}.png`;
+                                link.click();
+                              }}
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Download
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </SidebarMenuItem>
+                    ))
+                      )}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </Collapsible>
+
+            <SidebarSeparator />
+
             {/* Audio Files */}
-            <SidebarGroup>
-              <SidebarGroupLabel>Audiobook</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {audioFiles.length === 0 ? (
-                    <SidebarMenuItem>
-                      <div className="px-2 py-2 text-xs text-muted-foreground text-center">
-                        No audio generated yet.
-                      </div>
-                    </SidebarMenuItem>
-                  ) : (
+            <Collapsible 
+              open={audiobookOpen} 
+              onOpenChange={setAudiobookOpen}
+              defaultOpen={audioFiles.length > 0}
+            >
+              <SidebarGroup>
+                <CollapsibleTrigger asChild>
+                  <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50">
+                    <ChevronDown className={`h-3 w-3 transition-transform ${audiobookOpen ? 'rotate-0' : '-rotate-90'}`} />
+                    Audiobook
+                  </SidebarGroupLabel>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {audioFiles.length === 0 ? null : (
                     audioFiles.map((file: any) => (
                       <SidebarMenuItem key={file.id}>
                         <SidebarMenuButton
@@ -232,6 +428,7 @@ export function ProjectRightSidebar() {
                           isActive={preview?.type === 'audio' && preview?.url === file.audio_url}
                           className="group"
                         >
+                          <Mic className="h-4 w-4 shrink-0" />
                           <span className="truncate">Audio Version</span>
                         </SidebarMenuButton>
                         <DropdownMenu>
@@ -272,133 +469,297 @@ export function ProjectRightSidebar() {
                         </DropdownMenu>
                       </SidebarMenuItem>
                     ))
-                  )}
+                      )}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </Collapsible>
+
+            <SidebarSeparator />
+
+            {/* Print Files */}
+            <Collapsible 
+              open={printOpen} 
+              onOpenChange={setPrintOpen}
+              defaultOpen={printJobs.filter((job: any) => job.format === 'print').length > 0}
+            >
+              <SidebarGroup>
+                <CollapsibleTrigger asChild>
+                  <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50">
+                    <ChevronDown className={`h-3 w-3 transition-transform ${printOpen ? 'rotate-0' : '-rotate-90'}`} />
+                    Print
+                  </SidebarGroupLabel>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {(() => {
+                        const printFiles = printJobs.filter((job: any) => job.format === 'print');
+                        const displayCount = showAllPrint ? printFiles.length : 5;
+                        const hasMore = printFiles.length > 5;
+                        
+                        if (printFiles.length === 0) {
+                          return null;
+                        }
+                    
+                    return (
+                      <>
+                        {printFiles.slice(0, displayCount).map((job: any) => (
+                          <SidebarMenuItem key={job.id}>
+                            {job.status === 'completed' && job.pdf_file_url ? (
+                              <>
+                                <SidebarMenuButton
+                                  onClick={() => {
+                                    setPreview({
+                                      type: 'pdf',
+                                      url: job.pdf_file_url,
+                                      name: 'Print PDF',
+                                      format: 'print',
+                                      projectTitle: project?.title,
+                                    });
+                                  }}
+                                  isActive={preview?.type === 'pdf' && preview?.url === job.pdf_file_url && preview?.format === 'print'}
+                                  className="group"
+                                >
+                                  <BookOpen className="h-4 w-4 shrink-0" />
+                                  <div className="flex flex-col items-start overflow-hidden">
+                                    <span className="truncate font-medium">Print PDF</span>
+                                    <span className="text-[10px] text-muted-foreground truncate">
+                                      {new Date(job.created_at).toLocaleDateString()} • {job.font || 'Default'}
+                                    </span>
+                                  </div>
+                                </SidebarMenuButton>
+                                <DropdownMenu>
+                                  <SidebarMenuAction asChild showOnHover>
+                                    <DropdownMenuTrigger asChild>
+                                      <button
+                                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <MoreHorizontal className="h-4 w-4" />
+                                        <span className="sr-only">More options</span>
+                                      </button>
+                                    </DropdownMenuTrigger>
+                                  </SidebarMenuAction>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        window.open(job.pdf_file_url, '_blank');
+                                      }}
+                                    >
+                                      <ExternalLink className="mr-2 h-4 w-4" />
+                                      Open in new tab
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const link = document.createElement('a');
+                                        link.href = job.pdf_file_url;
+                                        link.download = '';
+                                        link.click();
+                                      }}
+                                    >
+                                      <Download className="mr-2 h-4 w-4" />
+                                      Download
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </>
+                            ) : (
+                              <SidebarMenuButton disabled className="group opacity-70">
+                                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                                <span className="truncate">Print PDF</span>
+                                <span className="ml-auto text-xs text-muted-foreground capitalize">
+                                  {job.status}
+                                </span>
+                              </SidebarMenuButton>
+                            )}
+                          </SidebarMenuItem>
+                        ))}
+                        {hasMore && (
+                          <SidebarMenuItem>
+                            <SidebarMenuButton
+                              onClick={() => setShowAllPrint(!showAllPrint)}
+                              className="text-xs text-muted-foreground justify-center h-8"
+                            >
+                              {showAllPrint ? (
+                                <>
+                                  <ChevronUp className="h-3 w-3 mr-1" />
+                                  Show Less
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown className="h-3 w-3 mr-1" />
+                                  View {printFiles.length - 5} more
+                                </>
+                              )}
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        )}
+                      </>
+                    );
+                  })()}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
 
             <SidebarSeparator />
 
-            {/* Print Files */}
-            <SidebarGroup>
-              <SidebarGroupLabel>Print & eBook</SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {printJobs.length === 0 ? (
-                    <SidebarMenuItem>
-                      <div className="px-2 py-2 text-xs text-muted-foreground text-center">
-                        No PDFs generated yet.
-                      </div>
-                    </SidebarMenuItem>
-                  ) : (
-                    printJobs.map((job: any) => (
-                      <SidebarMenuItem key={job.id}>
-                        {job.status === 'completed' && job.pdf_file_url ? (
+            {/* eBook Files */}
+            <Collapsible 
+              open={ebookOpen} 
+              onOpenChange={setEbookOpen}
+              defaultOpen={printJobs.filter((job: any) => job.format === 'ebook').length > 0}
+            >
+              <SidebarGroup>
+                <CollapsibleTrigger asChild>
+                  <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50">
+                    <ChevronDown className={`h-3 w-3 transition-transform ${ebookOpen ? 'rotate-0' : '-rotate-90'}`} />
+                    E-book
+                  </SidebarGroupLabel>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {(() => {
+                        const ebookFiles = printJobs.filter((job: any) => job.format === 'ebook');
+                        const displayCount = showAllEbook ? ebookFiles.length : 5;
+                        const hasMore = ebookFiles.length > 5;
+                        
+                        if (ebookFiles.length === 0) {
+                          return null;
+                        }
+                        
+                        return (
                           <>
+                            {ebookFiles.slice(0, displayCount).map((job: any) => (
+                          <SidebarMenuItem key={job.id}>
+                            {job.status === 'completed' && job.pdf_file_url ? (
+                              <>
+                                <SidebarMenuButton
+                                  onClick={() => {
+                                    setPreview({
+                                      type: 'pdf',
+                                      url: job.pdf_file_url,
+                                      name: 'E-book PDF',
+                                      format: 'ebook',
+                                      projectTitle: project?.title,
+                                    });
+                                  }}
+                                  isActive={preview?.type === 'pdf' && preview?.url === job.pdf_file_url && preview?.format === 'ebook'}
+                                  className="group"
+                                >
+                                  <Tablet className="h-4 w-4 shrink-0" />
+                                  <div className="flex flex-col items-start overflow-hidden">
+                                    <span className="truncate font-medium">E-book PDF</span>
+                                    <span className="text-[10px] text-muted-foreground truncate">
+                                      {new Date(job.created_at).toLocaleDateString()} • {job.font || 'Default'}
+                                    </span>
+                                  </div>
+                                </SidebarMenuButton>
+                                <DropdownMenu>
+                                  <SidebarMenuAction asChild showOnHover>
+                                    <DropdownMenuTrigger asChild>
+                                      <button
+                                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        <MoreHorizontal className="h-4 w-4" />
+                                        <span className="sr-only">More options</span>
+                                      </button>
+                                    </DropdownMenuTrigger>
+                                  </SidebarMenuAction>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        window.open(job.pdf_file_url, '_blank');
+                                      }}
+                                    >
+                                      <ExternalLink className="mr-2 h-4 w-4" />
+                                      Open in new tab
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const link = document.createElement('a');
+                                        link.href = job.pdf_file_url;
+                                        link.download = '';
+                                        link.click();
+                                      }}
+                                    >
+                                      <Download className="mr-2 h-4 w-4" />
+                                      Download
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </>
+                            ) : (
+                              <SidebarMenuButton disabled className="group opacity-70">
+                                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                                <span className="truncate">E-book PDF</span>
+                                <span className="ml-auto text-xs text-muted-foreground capitalize">
+                                  {job.status}
+                                </span>
+                              </SidebarMenuButton>
+                            )}
+                          </SidebarMenuItem>
+                        ))}
+                        {hasMore && (
+                          <SidebarMenuItem>
                             <SidebarMenuButton
-                              onClick={() => {
-                                setPreview({
-                                  type: 'pdf',
-                                  url: job.pdf_file_url,
-                                  name: `${job.format} PDF`,
-                                  format: job.format,
-                                  projectTitle: project?.title,
-                                });
-                              }}
-                              isActive={preview?.type === 'pdf' && preview?.url === job.pdf_file_url}
-                              className="group"
+                              onClick={() => setShowAllEbook(!showAllEbook)}
+                              className="text-xs text-muted-foreground justify-center h-8"
                             >
-                              <span className="truncate capitalize">{job.format} PDF</span>
+                              {showAllEbook ? (
+                                <>
+                                  <ChevronUp className="h-3 w-3 mr-1" />
+                                  Show Less
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown className="h-3 w-3 mr-1" />
+                                  View {ebookFiles.length - 5} more
+                                </>
+                              )}
                             </SidebarMenuButton>
-                            <DropdownMenu>
-                              <SidebarMenuAction asChild showOnHover>
-                                <DropdownMenuTrigger asChild>
-                                  <button
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">More options</span>
-                                  </button>
-                                </DropdownMenuTrigger>
-                              </SidebarMenuAction>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    window.open(job.pdf_file_url, '_blank');
-                                  }}
-                                >
-                                  <ExternalLink className="mr-2 h-4 w-4" />
-                                  Open in new tab
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const link = document.createElement('a');
-                                    link.href = job.pdf_file_url;
-                                    link.download = '';
-                                    link.click();
-                                  }}
-                                >
-                                  <Download className="mr-2 h-4 w-4" />
-                                  Download
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </>
-                        ) : (
-                          <SidebarMenuButton disabled className="group">
-                            <span className="truncate capitalize">{job.format} PDF</span>
-                            <span className="ml-auto text-xs text-muted-foreground capitalize">
-                              {job.status}
-                            </span>
-                          </SidebarMenuButton>
+                          </SidebarMenuItem>
                         )}
-                      </SidebarMenuItem>
-                    ))
-                  )}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
+                      </>
+                    );
+                  })()}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </Collapsible>
           </SidebarContent>
           <SidebarSeparator className="mx-0" />
           <SidebarFooter className="border-t border-sidebar-border p-4 mt-auto shrink-0">
             {project && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="text-xs font-medium text-muted-foreground">Manuscript Stats</span>
+              <div className="flex items-center gap-3">
+                <div>
+                  <div className="text-lg font-bold text-foreground font-mono">
+                    {Math.round((project.content?.split(/\s+/).length || 0) / 250).toLocaleString()}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Pages</div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div>
-                    <div className="text-lg font-bold text-foreground font-mono">
-                      {project.content?.split(/\s+/).length.toLocaleString() || 0}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Words</div>
+                <div className="w-px h-8 bg-sidebar-border" />
+                <div>
+                  <div className="text-lg font-bold text-foreground font-mono">
+                    {project.content?.split(/\s+/).length.toLocaleString() || 0}
                   </div>
-                  <div className="w-px h-8 bg-sidebar-border" />
-                  <div>
-                    <div className="text-lg font-bold text-foreground font-mono">
-                      {Math.round((project.content?.split(/\s+/).length || 0) / 250).toLocaleString()}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Pages</div>
-                  </div>
-                  <div className="w-px h-8 bg-sidebar-border" />
-                  <div>
-                    <div className="text-lg font-bold text-foreground font-mono">
-                      {project.content?.length.toLocaleString() || 0}
-                    </div>
-                    <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Chars</div>
-                  </div>
+                  <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Words</div>
                 </div>
-                {project.content && (
-                  <div className="pt-2">
-                    <Badge variant="outline" className="bg-background font-mono font-normal text-[10px] w-full justify-start">
-                      {project.content.slice(0, 30)}...
-                    </Badge>
+                <div className="w-px h-8 bg-sidebar-border" />
+                <div>
+                  <div className="text-lg font-bold text-foreground font-mono">
+                    {project.content?.length.toLocaleString() || 0}
                   </div>
-                )}
+                  <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Chars</div>
+                </div>
               </div>
             )}
           </SidebarFooter>
