@@ -402,14 +402,19 @@ export default function ProjectWorkspace({
                 </div>
               </div>
             )}
-            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-violet-700 to-violet-800 hover:from-violet-700/95 hover:to-violet-800/95 text-left max-w-4xl transition-all">
-              <div className="absolute top-4 right-4">
+            <div className="relative flex flex-col p-6 rounded-2xl border bg-card/80 shadow-sm overflow-hidden max-w-4xl">
+              <div
+                className="absolute inset-0 bg-gradient-to-br from-violet-500/15 via-violet-600/10 to-transparent opacity-90"
+                aria-hidden
+              />
+              <div className="absolute inset-0 border border-violet-200/40 dark:border-violet-900/60 rounded-2xl pointer-events-none" />
+              <div className="absolute top-4 right-4 z-10">
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
+                      className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
                     >
                       <Settings className="h-4 w-4" />
                     </Button>
@@ -491,32 +496,32 @@ export default function ProjectWorkspace({
                   </PopoverContent>
                 </Popover>
               </div>
-              <div className="flex items-start gap-4 mb-5">
-                <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-[1.02]">
-                  <Sparkles className="h-7 w-7 text-white" />
+              <div className="relative z-10 flex items-start gap-4 mb-5">
+                <div className="w-14 h-14 rounded-xl border border-violet-100 dark:border-violet-900 bg-gradient-to-br from-white to-violet-50 dark:from-violet-950/60 dark:to-violet-900/40 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="h-7 w-7 text-violet-600 dark:text-violet-200" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-xl text-white mb-2">Editor</h3>
-                  <p className="text-sm text-white/90 leading-relaxed">
+                  <h3 className="font-semibold text-xl text-foreground mb-2">Editor</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     Get intelligent feedback on dramaturgy, style, and spelling. Improve your manuscript with professional editing insights.
                   </p>
                 </div>
               </div>
-              <div className="text-sm text-white/80 mb-5 space-y-2.5">
+              <div className="relative z-10 text-sm text-muted-foreground mb-5 space-y-2.5">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500/60 flex-shrink-0"></span>
                   <span>Dramaturgy analysis</span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500/60 flex-shrink-0"></span>
                   <span>Style suggestions</span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500/60 flex-shrink-0"></span>
                   <span>Spelling & grammar check</span>
                 </div>
               </div>
-              <div className="pt-4 border-t border-white/20 space-y-4">
+              <div className="relative z-10 pt-4 border-t border-violet-100 dark:border-violet-900/60 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <button
                     onClick={() => {
@@ -524,10 +529,10 @@ export default function ProjectWorkspace({
                       console.log('Dramaturgy analysis clicked');
                     }}
                     disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
-                    className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex flex-col items-center justify-center p-4 rounded-xl border border-violet-100/70 dark:border-violet-900/60 bg-gradient-to-br from-white to-violet-50 dark:from-violet-950/50 dark:to-violet-900/40 hover:border-violet-300 dark:hover:border-violet-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <FileEdit className="h-5 w-5 text-white mb-2" />
-                    <span className="text-xs font-medium text-white">Dramaturgy</span>
+                    <FileEdit className="h-5 w-5 text-violet-600 dark:text-violet-200 mb-2" />
+                    <span className="text-xs font-medium text-foreground">Dramaturgy</span>
                   </button>
                   <button
                     onClick={() => {
@@ -535,10 +540,10 @@ export default function ProjectWorkspace({
                       console.log('Style analysis clicked');
                     }}
                     disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
-                    className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex flex-col items-center justify-center p-4 rounded-xl border border-violet-100/70 dark:border-violet-900/60 bg-gradient-to-br from-white to-violet-50 dark:from-violet-950/50 dark:to-violet-900/40 hover:border-violet-300 dark:hover:border-violet-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Sparkles className="h-5 w-5 text-white mb-2" />
-                    <span className="text-xs font-medium text-white">Style</span>
+                    <Sparkles className="h-5 w-5 text-violet-600 dark:text-violet-200 mb-2" />
+                    <span className="text-xs font-medium text-foreground">Style</span>
                   </button>
                   <button
                     onClick={() => {
@@ -546,28 +551,28 @@ export default function ProjectWorkspace({
                       console.log('Spelling check clicked');
                     }}
                     disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
-                    className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex flex-col items-center justify-center p-4 rounded-xl border border-violet-100/70 dark:border-violet-900/60 bg-gradient-to-br from-white to-violet-50 dark:from-violet-950/50 dark:to-violet-900/40 hover:border-violet-300 dark:hover:border-violet-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <FileText className="h-5 w-5 text-white mb-2" />
-                    <span className="text-xs font-medium text-white">Spelling</span>
+                    <FileText className="h-5 w-5 text-violet-600 dark:text-violet-200 mb-2" />
+                    <span className="text-xs font-medium text-foreground">Spelling</span>
                   </button>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Analysis Type</p>
-                    <p className="text-sm text-white/90">Intelligent</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Analysis Type</p>
+                    <p className="text-sm text-foreground">Intelligent</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Use Case</p>
-                    <p className="text-sm text-white/90">Writing improvement</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Use Case</p>
+                    <p className="text-sm text-foreground">Writing improvement</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Coverage</p>
-                    <p className="text-sm text-white/90">Full manuscript</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Coverage</p>
+                    <p className="text-sm text-foreground">Full manuscript</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Language</p>
-                    <p className="text-sm text-white/90">Multiple</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Language</p>
+                    <p className="text-sm text-foreground">Multiple</p>
                   </div>
                 </div>
               </div>
@@ -637,14 +642,19 @@ export default function ProjectWorkspace({
           </TabsContent>
 
           <TabsContent value="print" className="mt-6">
-            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-emerald-700 to-emerald-800 hover:from-emerald-700/95 hover:to-emerald-800/95 text-left transition-all group h-full max-w-4xl">
-                <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
+            <div className="relative flex flex-col p-6 rounded-2xl border bg-card/80 shadow-sm overflow-hidden h-full max-w-4xl">
+                <div
+                  className="absolute inset-0 bg-gradient-to-br from-emerald-500/15 via-emerald-600/10 to-transparent"
+                  aria-hidden
+                />
+                <div className="absolute inset-0 border border-emerald-200/50 dark:border-emerald-900/50 rounded-2xl pointer-events-none" />
+                <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
+                        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
                       >
                         <Settings className="h-4 w-4" />
                       </Button>
@@ -678,57 +688,56 @@ export default function ProjectWorkspace({
                     </PopoverContent>
                   </Popover>
                 </div>
-                <div className="flex items-start gap-4 mb-5">
-                  <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-[1.02]">
-                    <BookOpen className="h-7 w-7 text-white" />
+                <div className="relative z-10 flex items-start gap-4 mb-5">
+                  <div className="w-14 h-14 rounded-xl border border-emerald-100 dark:border-emerald-900 bg-gradient-to-br from-white to-emerald-50 dark:from-emerald-950/60 dark:to-emerald-900/40 flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="h-7 w-7 text-emerald-600 dark:text-emerald-200" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-xl text-white mb-2">Print Book PDF</h3>
-                    <p className="text-sm text-white/90 leading-relaxed">
-                      Standard 6x9&quot; layout with industry margins. Perfect for physical printing and distribution.
+                    <h3 className="font-semibold text-xl text-foreground mb-2">Print Book PDF</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Standard 6x9" layout with industry margins. Perfect for physical printing and distribution.
                     </p>
                   </div>
                 </div>
-                <div className="text-sm text-white/80 mb-5 space-y-2.5">
+                <div className="relative z-10 text-sm text-muted-foreground mb-5 space-y-2.5">
                   <div className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/70 flex-shrink-0"></span>
                     <span>Professional typesetting</span>
                   </div>
                   <div className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/70 flex-shrink-0"></span>
                     <span>Industry-standard margins</span>
                   </div>
                   <div className="flex items-center gap-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/70 flex-shrink-0"></span>
                     <span>Print-ready format</span>
                   </div>
                 </div>
-                <div className="mt-auto pt-4 border-t border-white/20">
+                <div className="relative z-10 mt-auto pt-4 border-t border-emerald-100 dark:border-emerald-900/60">
                   <div className="space-y-3 mb-4">
                     <div>
-                      <p className="text-xs font-medium text-white/70 mb-1">Format</p>
-                      <p className="text-sm text-white/90">6x9&quot; PDF</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Format</p>
+                      <p className="text-sm text-foreground">6x9" PDF</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-white/70 mb-1">Use Case</p>
-                      <p className="text-sm text-white/90">Physical printing, POD services</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Use Case</p>
+                      <p className="text-sm text-foreground">Physical printing, POD services</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-white/70 mb-1">Typical Size</p>
-                      <p className="text-sm text-white/90">~2-5 MB per file</p>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">Typical Size</p>
+                      <p className="text-sm text-foreground">~2-5 MB per file</p>
                     </div>
                   </div>
-                  <button
+                  <Button
                     onClick={() => handleGenerateFromText('print')}
                     disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
-                    className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white text-sm font-semibold hover:bg-white/25 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full justify-center bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
                   >
                     {isGeneratingPrint ? 'Typesetting...' : 'Generate Print'}
-                  </button>
+                  </Button>
                 </div>
               </div>
-            
-            {/* Empty State - Upload Section */}
+{/* Empty State - Upload Section */}
             {isProjectPage && !preview && (
               <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm p-0 mt-6">
                 <div
@@ -792,14 +801,19 @@ export default function ProjectWorkspace({
           </TabsContent>
 
           <TabsContent value="ebook" className="mt-6">
-            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-cyan-700 to-cyan-800 hover:from-cyan-700/95 hover:to-cyan-800/95 text-left transition-all group h-full max-w-4xl">
-              <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
+            <div className="relative flex flex-col p-6 rounded-2xl border bg-card/80 shadow-sm overflow-hidden h-full max-w-4xl">
+              <div
+                className="absolute inset-0 bg-gradient-to-br from-cyan-500/15 via-cyan-600/10 to-transparent"
+                aria-hidden
+              />
+              <div className="absolute inset-0 border border-cyan-200/50 dark:border-cyan-900/50 rounded-2xl pointer-events-none" />
+              <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
+                      className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted"
                     >
                       <Settings className="h-4 w-4" />
                     </Button>
@@ -833,57 +847,56 @@ export default function ProjectWorkspace({
                   </PopoverContent>
                 </Popover>
               </div>
-              <div className="flex items-start gap-4 mb-5">
-                <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-[1.02]">
-                  <Tablet className="h-7 w-7 text-white" />
+              <div className="relative z-10 flex items-start gap-4 mb-5">
+                <div className="w-14 h-14 rounded-xl border border-cyan-100 dark:border-cyan-900 bg-gradient-to-br from-white to-cyan-50 dark:from-cyan-950/60 dark:to-cyan-900/40 flex items-center justify-center flex-shrink-0">
+                  <Tablet className="h-7 w-7 text-cyan-600 dark:text-cyan-200" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-xl text-white mb-2">E-book PDF</h3>
-                  <p className="text-sm text-white/90 leading-relaxed">
+                  <h3 className="font-semibold text-xl text-foreground mb-2">E-book PDF</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     Digital-first A5 layout optimized for screens. Ideal for e-readers and tablets.
                   </p>
                 </div>
               </div>
-              <div className="text-sm text-white/80 mb-5 space-y-2.5">
+              <div className="relative z-10 text-sm text-muted-foreground mb-5 space-y-2.5">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/70 flex-shrink-0"></span>
                   <span>Screen-optimized layout</span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/70 flex-shrink-0"></span>
                   <span>Reflowable text</span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-500/70 flex-shrink-0"></span>
                   <span>E-reader compatible</span>
                 </div>
               </div>
-              <div className="mt-auto pt-4 border-t border-white/20">
+              <div className="relative z-10 mt-auto pt-4 border-t border-cyan-100 dark:border-cyan-900/60">
                 <div className="space-y-3 mb-4">
                   <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Format</p>
-                    <p className="text-sm text-white/90">A5 PDF</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Format</p>
+                    <p className="text-sm text-foreground">A5 PDF</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Use Case</p>
-                    <p className="text-sm text-white/90">E-readers, tablets, digital distribution</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Use Case</p>
+                    <p className="text-sm text-foreground">E-readers, tablets, digital distribution</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Typical Size</p>
-                    <p className="text-sm text-white/90">~1-3 MB per file</p>
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Typical Size</p>
+                    <p className="text-sm text-foreground">~1-3 MB per file</p>
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={() => handleGenerateFromText('ebook')}
                   disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
-                  className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white text-sm font-semibold hover:bg-white/25 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full justify-center bg-cyan-600 text-white hover:bg-cyan-700 disabled:opacity-50"
                 >
-                  {isGeneratingEbook ? 'Converting...' : 'Generate E-book'}
-                </button>
+                  {isGeneratingPrint ? 'Generating...' : 'Generate E-book'}
+                </Button>
               </div>
             </div>
-            
-            {/* Empty State - Upload Section */}
+{/* Empty State - Upload Section */}
             {isProjectPage && !preview && (
               <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm p-0 mt-6">
                 <div
