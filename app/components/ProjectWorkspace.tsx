@@ -1503,14 +1503,14 @@ export default function ProjectWorkspace({
             <div className="mt-6">
               {coverGenerations.length === 0 ? (
                 <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
-                  <CardHeader>
-                    <CardTitle>Template Covers</CardTitle>
-                    <CardDescription>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg">Template Covers</CardTitle>
+                    <CardDescription className="text-sm">
                       Browse template covers or generate a custom one using the prompt above
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <CardContent className="pt-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                       {[
                         { id: '1', title: 'Minimalist', description: 'Clean and simple design' },
                         { id: '2', title: 'Abstract', description: 'Modern abstract art' },
@@ -1523,7 +1523,7 @@ export default function ProjectWorkspace({
                       ].map((template) => (
                         <div
                           key={template.id}
-                          className="group relative aspect-[2/3] rounded-lg border-2 border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer overflow-hidden"
+                          className="group relative aspect-[2/3] rounded-xl border-2 border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer overflow-hidden shadow-sm hover:shadow-md"
                           onClick={() => {
                             // For templates, we could show a preview or use them as inspiration
                             // For now, just show a placeholder
@@ -1531,14 +1531,14 @@ export default function ProjectWorkspace({
                         >
                           <div className="absolute inset-0 flex items-center justify-center p-4">
                             <div className="text-center">
-                              <Palette className="h-8 w-8 mx-auto mb-2 text-zinc-400 dark:text-zinc-600" />
+                              <Palette className="h-8 w-8 mx-auto mb-2 text-zinc-400 dark:text-zinc-600 transition-transform group-hover:scale-110" />
                               <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{template.title}</p>
                             </div>
                           </div>
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div className="absolute bottom-0 left-0 right-0 p-3">
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <div className="absolute bottom-0 left-0 right-0 p-3 space-y-1">
                               <p className="text-xs text-white font-medium">{template.title}</p>
-                              <p className="text-xs text-white/80">{template.description}</p>
+                              <p className="text-xs text-white/80 leading-tight">{template.description}</p>
                             </div>
                           </div>
                         </div>
@@ -1548,18 +1548,18 @@ export default function ProjectWorkspace({
                 </Card>
               ) : (
                 <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
-                  <CardHeader>
-                    <CardTitle>Generated Covers</CardTitle>
-                    <CardDescription>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg">Generated Covers</CardTitle>
+                    <CardDescription className="text-sm">
                       Your generated cover designs
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <CardContent className="pt-0">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                       {coverGenerations.map((cover) => (
                         <div
                           key={cover.id}
-                          className="group relative aspect-[2/3] rounded-lg border-2 border-zinc-200 dark:border-zinc-800 overflow-hidden hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer"
+                          className="group relative aspect-[2/3] rounded-xl border-2 border-zinc-200 dark:border-zinc-800 overflow-hidden hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer shadow-sm hover:shadow-md"
                           onClick={() => {
                             setPreview({
                               url: cover.cover_url,
@@ -1573,16 +1573,16 @@ export default function ProjectWorkspace({
                           <img
                             src={cover.cover_url}
                             alt={cover.prompt || 'Generated cover'}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div className="absolute bottom-0 left-0 right-0 p-3">
-                              <p className="text-xs text-white font-medium line-clamp-2">{cover.prompt}</p>
-                              <div className="flex items-center gap-2 mt-2">
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <div className="absolute bottom-0 left-0 right-0 p-3 space-y-2">
+                              <p className="text-xs text-white font-medium line-clamp-2 leading-tight">{cover.prompt}</p>
+                              <div className="flex items-center gap-1.5">
                                 <Button
                                   size="sm"
                                   variant="secondary"
-                                  className="h-6 text-xs"
+                                  className="h-7 text-xs px-2.5 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     window.open(cover.cover_url, '_blank');
@@ -1594,7 +1594,7 @@ export default function ProjectWorkspace({
                                 <Button
                                   size="sm"
                                   variant="secondary"
-                                  className="h-6 text-xs"
+                                  className="h-7 text-xs px-2.5 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     const link = document.createElement('a');

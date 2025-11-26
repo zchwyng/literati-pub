@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useParams, usePathname } from 'next/navigation';
 import { PanelRightIcon } from 'lucide-react';
 import {
+  Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarFooter,
@@ -16,6 +17,7 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
   SidebarRail,
+  SidebarMenuBadge,
 } from '@/components/ui/sidebar';
 import {
   Download,
@@ -34,6 +36,15 @@ import {
 import { getAudioGenerations, getProject, getCoverGenerations } from '../actions';
 import { getPrintJobs } from '../actions/print';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -146,8 +157,12 @@ export function ProjectRightSidebar() {
 
   // Extract unique manuscript versions from print jobs
   const manuscriptVersions = React.useMemo(() => {
+    if (!printJobs || printJobs.length === 0) {
+      return [];
+    }
+    
     const versions = printJobs
-      .filter((job: any) => job.original_file_url && job.original_file_url.trim() !== '')
+      .filter((job: any) => job.original_file_url && typeof job.original_file_url === 'string' && job.original_file_url.trim() !== '')
       .map((job: any) => ({
         id: `ms-${job.id}`,
         url: job.original_file_url,
@@ -159,6 +174,7 @@ export function ProjectRightSidebar() {
         index === self.findIndex((v) => v.url === version.url)
       )
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    
     return versions;
   }, [printJobs]);
 
@@ -191,67 +207,66 @@ export function ProjectRightSidebar() {
     }
   }, [isProjectPage, fetchFiles]);
 
+  // Auto-open manuscript versions section if there are versions
+  React.useEffect(() => {
+    if (manuscriptVersions.length > 0 && !manuscriptVersionsOpen) {
+      setManuscriptVersionsOpen(true);
+    }
+  }, [manuscriptVersions.length, manuscriptVersionsOpen]);
+
   if (!isProjectPage) return null;
 
   const isCollapsed = state === 'collapsed';
 
   return (
-    <div
-      className="group peer text-sidebar-foreground hidden md:block"
-      data-state={state}
-      data-collapsible={isCollapsed ? 'offcanvas' : ''}
-      data-side="right"
-      data-slot="sidebar"
+    <Sidebar
+      side="right"
+      collapsible={isCollapsed ? 'offcanvas' : 'none'}
+      className={cn(
+        "sticky top-0 hidden h-svh border-l lg:flex",
+        isCollapsed && "hidden"
+      )}
     >
-      {/* Sidebar gap for layout */}
-      <div
-        data-slot="sidebar-gap"
-        className={cn(
-          "relative bg-transparent transition-[width] duration-200 ease-linear",
-          "w-[16rem]",
-          "group-data-[collapsible=offcanvas]:w-0"
-        )}
-        style={{ width: isCollapsed ? 0 : SIDEBAR_WIDTH }}
-      />
-      {/* Sidebar container with smooth animation */}
-      <div
-        data-slot="sidebar-container"
-        className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh md:flex",
-          "transition-[right] duration-200 ease-linear",
-          "border-l border-sidebar-border"
-        )}
-        style={{
-          width: SIDEBAR_WIDTH,
-          right: isCollapsed ? `calc(${SIDEBAR_WIDTH} * -1)` : 0,
-        }}
-      >
-        <div
-          data-sidebar="sidebar"
-          data-slot="sidebar-inner"
-          className="bg-sidebar flex h-full w-full flex-col overflow-hidden"
-        >
           <SidebarHeader className="h-16 border-b border-sidebar-border flex flex-row items-center justify-between px-4">
             <span className="text-sm font-semibold">Binder</span>
           </SidebarHeader>
-          <SidebarContent className="flex-1 overflow-auto">
+          <SidebarContent className="flex-1 overflow-y-auto overflow-x-hidden">
             {/* Manuscript Versions - Moved to top */}
             <Collapsible 
               open={manuscriptVersionsOpen} 
               onOpenChange={setManuscriptVersionsOpen}
-              defaultOpen={manuscriptVersions.length > 0}
+              defaultOpen={false}
             >
               <SidebarGroup>
                 <CollapsibleTrigger asChild>
                   <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50">
                     <ChevronDown className={`h-3 w-3 transition-transform ${manuscriptVersionsOpen ? 'rotate-0' : '-rotate-90'}`} />
                     Manuscript Versions
+                    {manuscriptVersions.length > 0 && (
+                      <SidebarMenuBadge>{manuscriptVersions.length}</SidebarMenuBadge>
+                    )}
                   </SidebarGroupLabel>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarGroupContent>
                     <SidebarMenu>
-                      {manuscriptVersions.length === 0 ? null : (
+                      {manuscriptVersions.length === 0 ? (
+                        <SidebarMenuItem>
+                          <Empty className="p-2 border-0">
+                            <EmptyContent>
+                              <EmptyMedia variant="icon">
+                                <FileText className="h-3 w-3" />
+                              </EmptyMedia>
+                              <EmptyHeader>
+                                <EmptyTitle className="text-xs">No manuscripts</EmptyTitle>
+                                <EmptyDescription className="text-[10px]">
+                                  Upload a .docx file to get started
+                                </EmptyDescription>
+                              </EmptyHeader>
+                            </EmptyContent>
+                          </Empty>
+                        </SidebarMenuItem>
+                      ) : (
                     manuscriptVersions.map((version: any) => (
                       <SidebarMenuItem key={version.id}>
                         <SidebarMenuButton
@@ -263,6 +278,7 @@ export function ProjectRightSidebar() {
                             link.target = '_blank';
                             link.click();
                           }}
+                          disabled={loading}
                           className="group"
                         >
                           <FileText className="h-4 w-4 shrink-0" />
@@ -319,19 +335,38 @@ export function ProjectRightSidebar() {
             <Collapsible 
               open={coversOpen} 
               onOpenChange={setCoversOpen}
-              defaultOpen={coverGenerations.length > 0}
+              defaultOpen={false}
             >
               <SidebarGroup>
                 <CollapsibleTrigger asChild>
                   <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50">
                     <ChevronDown className={`h-3 w-3 transition-transform ${coversOpen ? 'rotate-0' : '-rotate-90'}`} />
                     Covers
+                    {coverGenerations.length > 0 && (
+                      <SidebarMenuBadge>{coverGenerations.length}</SidebarMenuBadge>
+                    )}
                   </SidebarGroupLabel>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarGroupContent>
                     <SidebarMenu>
-                      {coverGenerations.length === 0 ? null : (
+                      {coverGenerations.length === 0 ? (
+                        <SidebarMenuItem>
+                          <Empty className="p-2 border-0">
+                            <EmptyContent>
+                              <EmptyMedia variant="icon">
+                                <Palette className="h-3 w-3" />
+                              </EmptyMedia>
+                              <EmptyHeader>
+                                <EmptyTitle className="text-xs">No covers</EmptyTitle>
+                                <EmptyDescription className="text-[10px]">
+                                  Generate a cover in the Cover tab
+                                </EmptyDescription>
+                              </EmptyHeader>
+                            </EmptyContent>
+                          </Empty>
+                        </SidebarMenuItem>
+                      ) : (
                     coverGenerations.map((cover: any) => (
                       <SidebarMenuItem key={cover.id}>
                         <SidebarMenuButton
@@ -345,6 +380,7 @@ export function ProjectRightSidebar() {
                             });
                           }}
                           isActive={preview?.type === 'cover' && preview?.url === cover.cover_url}
+                          disabled={loading}
                           className="group"
                         >
                           <Palette className="h-4 w-4 shrink-0" />
@@ -401,19 +437,38 @@ export function ProjectRightSidebar() {
             <Collapsible 
               open={audiobookOpen} 
               onOpenChange={setAudiobookOpen}
-              defaultOpen={audioFiles.length > 0}
+              defaultOpen={false}
             >
               <SidebarGroup>
                 <CollapsibleTrigger asChild>
                   <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50">
                     <ChevronDown className={`h-3 w-3 transition-transform ${audiobookOpen ? 'rotate-0' : '-rotate-90'}`} />
                     Audiobook
+                    {audioFiles.length > 0 && (
+                      <SidebarMenuBadge>{audioFiles.length}</SidebarMenuBadge>
+                    )}
                   </SidebarGroupLabel>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarGroupContent>
                     <SidebarMenu>
-                      {audioFiles.length === 0 ? null : (
+                      {audioFiles.length === 0 ? (
+                        <SidebarMenuItem>
+                          <Empty className="p-2 border-0">
+                            <EmptyContent>
+                              <EmptyMedia variant="icon">
+                                <Mic className="h-3 w-3" />
+                              </EmptyMedia>
+                              <EmptyHeader>
+                                <EmptyTitle className="text-xs">No audio</EmptyTitle>
+                                <EmptyDescription className="text-[10px]">
+                                  Generate audio in the Audiobook tab
+                                </EmptyDescription>
+                              </EmptyHeader>
+                            </EmptyContent>
+                          </Empty>
+                        </SidebarMenuItem>
+                      ) : (
                     audioFiles.map((file: any) => (
                       <SidebarMenuItem key={file.id}>
                         <SidebarMenuButton
@@ -426,6 +481,7 @@ export function ProjectRightSidebar() {
                             });
                           }}
                           isActive={preview?.type === 'audio' && preview?.url === file.audio_url}
+                          disabled={loading}
                           className="group"
                         >
                           <Mic className="h-4 w-4 shrink-0" />
@@ -482,7 +538,7 @@ export function ProjectRightSidebar() {
             <Collapsible 
               open={printOpen} 
               onOpenChange={setPrintOpen}
-              defaultOpen={printJobs.filter((job: any) => job.format === 'print').length > 0}
+              defaultOpen={false}
             >
               <SidebarGroup>
                 <CollapsibleTrigger asChild>
@@ -520,6 +576,7 @@ export function ProjectRightSidebar() {
                                     });
                                   }}
                                   isActive={preview?.type === 'pdf' && preview?.url === job.pdf_file_url && preview?.format === 'print'}
+                                  disabled={loading}
                                   className="group"
                                 >
                                   <BookOpen className="h-4 w-4 shrink-0" />
@@ -601,9 +658,11 @@ export function ProjectRightSidebar() {
                       </>
                     );
                   })()}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </SidebarGroup>
+            </Collapsible>
 
             <SidebarSeparator />
 
@@ -611,13 +670,16 @@ export function ProjectRightSidebar() {
             <Collapsible 
               open={ebookOpen} 
               onOpenChange={setEbookOpen}
-              defaultOpen={printJobs.filter((job: any) => job.format === 'ebook').length > 0}
+              defaultOpen={false}
             >
               <SidebarGroup>
                 <CollapsibleTrigger asChild>
                   <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50">
                     <ChevronDown className={`h-3 w-3 transition-transform ${ebookOpen ? 'rotate-0' : '-rotate-90'}`} />
                     E-book
+                    {printJobs.filter((job: any) => job.format === 'ebook').length > 0 && (
+                      <SidebarMenuBadge>{printJobs.filter((job: any) => job.format === 'ebook').length}</SidebarMenuBadge>
+                    )}
                   </SidebarGroupLabel>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -649,6 +711,7 @@ export function ProjectRightSidebar() {
                                     });
                                   }}
                                   isActive={preview?.type === 'pdf' && preview?.url === job.pdf_file_url && preview?.format === 'ebook'}
+                                  disabled={loading}
                                   className="group"
                                 >
                                   <Tablet className="h-4 w-4 shrink-0" />
@@ -764,8 +827,6 @@ export function ProjectRightSidebar() {
             )}
           </SidebarFooter>
           <SidebarRail />
-        </div>
-      </div>
-    </div>
+    </Sidebar>
   );
 }
