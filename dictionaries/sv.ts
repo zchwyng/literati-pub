@@ -8,40 +8,45 @@ const dictionary: Dictionary = {
     signUp: 'Skapa konto',
   },
   hero: {
-    badge: 'För indieförfattare och debutanter',
-    title: 'Gör ditt utkast till en bok redo för bokhandel.',
-    highlight: 'Ingen formatering. Ingen stress.',
+    badge: 'Nu i öppen beta för indieförfattare',
+    title: 'Gör klart boken utan att brottas med produktionen.',
+    highlight: 'Ljud, tryck och export i ett arbetsflöde.',
     description:
-      'Ladda upp berättelsen du drömt om. Vi förfinar den till en ljudbok och en tryckfärdig roman som följer branschens standarder—så att du äntligen kan hålla boken i handen och dela den med läsare.',
+      'Släpp in manus, välj rätt berättarröst och ladda ner filer som följer ACX, KDP och IngramSpark. Ingen gissning, inga verktyg att jonglera.',
+    ctaPrimary: 'Börja gratis',
+    ctaSecondary: 'Se hur det fungerar',
     checklist: [
-      'Ladda upp ditt Word-dokument, vi hanterar specifikationerna',
-      'Berättarröst justerad för ton och känsla',
-      'Tryck-PDF:er klara för Amazon KDP och IngramSpark',
+      'Dra-och-släpp Word och Google Docs',
+      'Berättarröst anpassad efter genre och tempo',
+      'Tryck-PDF:er med trim, marginaler och innehållsförteckning klart',
     ],
-    uploaderNote: 'Gratis att börja. Ditt första projekt bjuder vi på.',
-    quickSteps: ['Idé till färdiga filer på några minuter', 'Behåll ägandet över varje fil'],
+    uploaderNote: 'Ladda upp ett provkapitel—ingen kortinfo behövs. Behåll varje export.',
+    quickSteps: [
+      'Förbered, förhandsgranska och publicera i samma flöde',
+      'Behåll rättigheter, masterfiler och distributionsval',
+    ],
     stats: [
-      { label: 'Ljudbokskapitel', value: 'Klart på ca 10 min' },
-      { label: 'Trycklayout', value: '6x9” roman-PDF' },
-      { label: 'Regelefterlevnad', value: 'ACX + KDP-specar' },
-      { label: 'Kontroll', value: 'Ladda ner och äg allt' },
+      { label: 'Ljudutkast', value: 'Kapitel klara på ~10 min' },
+      { label: 'Trycklayout', value: '6x9” & 5x8” exporter' },
+      { label: 'Regelefterlevnad', value: 'ACX + KDP anpassat' },
+      { label: 'Kontroll', value: 'Ladda ner allt' },
     ],
-    cardLabel: 'Startplatta för indieförfattare',
-    cardTitle: 'Från manus till marknad',
-    promiseTitle: 'Byggt för författare som aldrig vill röra InDesign.',
+    cardLabel: 'Produktionscockpit',
+    cardTitle: 'Alla leverabler sida vid sida',
+    promiseTitle: 'Hoppa över programvarudjungeln.',
     promiseDescription:
-      'Ladda upp en gång, förhandsgranska och exportera polerade filer som du kan publicera idag. Fortsätt skriva—vi tar hand om tekniken.',
+      'Ladda upp en gång, förhandsgranska ljud och tryck, och exportera polerade filer idag.',
   },
   howItWorks: {
-    title: 'Din skrivresa utan teknikhuvudvärk',
+    title: 'Se din bok gå från utkast till leverabel',
     description:
-      'Från en gnista till en färdig bok du kan dela—varje steg är tydligt, snabbt och författarvänligt.',
+      'Ett guidat flöde som låter dig skriva vidare medan vi hanterar specifikationer, timing och exporter.',
     steps: [
       {
         number: '1',
         title: 'Ladda upp och andas ut',
         description:
-          'Lämna in ditt utkast och hoppa över formateringsreglerna. Vi städar, strukturerar och förbereder berättelsen direkt.',
+          'Lämna in ditt utkast och hoppa över formateringsreglerna. Vi städar, strukturerar och förbereder berättelsen så fort den landar.',
         image:
           'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80&auto=format&fit=crop',
       },
@@ -49,7 +54,7 @@ const dictionary: Dictionary = {
         number: '2',
         title: 'Välj röst och utseende',
         description:
-          'Välj en berättarröst som matchar din ton och se kapitlen falla på plats i en vacker, tryckfärdig layout. Förhandsgranska innan du exporterar.',
+          'Välj en berättarröst som matchar din ton och se kapitlen falla på plats i en polerad, tryckfärdig layout. Förhandsgranska innan du exporterar.',
         image:
           'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&q=80&auto=format&fit=crop',
       },
@@ -57,7 +62,7 @@ const dictionary: Dictionary = {
         number: '3',
         title: 'Publicera med trygghet',
         description:
-          'Exportera ACX-godkända ljudfiler och KDP-klara PDF:er. Inget gissande, inga avslag—bara filer du kan ladda upp direkt.',
+          'Exportera ACX-godkända ljudfiler och KDP-klara PDF:er. Ingen gissning, inga avslag—bara filer redo att skickas.',
         image:
           'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80&auto=format&fit=crop',
       },
@@ -119,7 +124,7 @@ const dictionary: Dictionary = {
     ],
   },
   callout: {
-    tag: 'byggt av författare för författare',
+    tag: 'beta-platser öppna nu',
     title: 'Du fokuserar på berättelsen. Vi paketerar den för varje hylla.',
     description:
       'Förhandslyssna, justera tempot och exportera filer redo att laddas upp på ett och samma ställe. Inget mer jonglerande av frilansare eller designprogram.',
