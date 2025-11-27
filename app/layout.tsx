@@ -29,12 +29,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headersList = await headers();
+  const headersList = headers();
   const locale =
     (headersList.get('x-locale') as Locale | null) ?? i18n.defaultLocale;
 
