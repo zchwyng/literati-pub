@@ -121,3 +121,45 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Stack Auth styling improvements */
+@layer components {
+  /* Improve Stack Auth form styling */
+  .stack-auth-container {
+    @apply w-full;
+  }
+
+  /* Form inputs - target Stack Auth inputs */
+  .stack-auth-container input[type='email'],
+  .stack-auth-container input[type='password'],
+  .stack-auth-container input[type='text'] {
+    @apply w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all;
+  }
+
+  /* Primary submit buttons */
+  .stack-auth-container button[type='submit'] {
+    @apply w-full py-2.5 px-4 rounded-lg font-medium bg-primary text-primary-foreground hover:opacity-90 shadow-sm transition-all;
+  }
+
+  /* Links */
+  .stack-auth-container a {
+    @apply text-primary hover:underline text-sm;
+  }
+
+  /* Labels */
+  .stack-auth-container label {
+    @apply text-sm font-medium text-foreground mb-1.5 block;
+  }
+
+  /* Error messages */
+  .stack-auth-container [role='alert'],
+  .stack-auth-container .error {
+    @apply text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg p-3 mt-2;
+  }
+
+  /* Social login buttons */
+  .stack-auth-container button[data-provider],
+  .stack-auth-container button:has([data-provider]) {
+    @apply w-full py-2.5 px-4 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-foreground hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2;
+  }
+}
