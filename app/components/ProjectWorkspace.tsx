@@ -45,12 +45,34 @@ import {
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, FileText, Mic, Printer, BookOpen, Tablet, Upload, ExternalLink, Download, X, Eye, Palette, Settings, Loader2, FileEdit, Sparkles, MoreHorizontal } from 'lucide-react';
+import {
+  ArrowLeft,
+  FileText,
+  Mic,
+  Printer,
+  BookOpen,
+  Tablet,
+  Upload,
+  ExternalLink,
+  Download,
+  X,
+  Eye,
+  Palette,
+  Settings,
+  Loader2,
+  FileEdit,
+  Sparkles,
+  MoreHorizontal,
+} from 'lucide-react';
 import ProjectActions from './ProjectActions';
 import { useFilePreview } from './FilePreviewContext';
 import { usePathname } from 'next/navigation';
 import mammoth from 'mammoth';
-import { updateProject, generateCoverImage, getCoverGenerations } from '../actions';
+import {
+  updateProject,
+  generateCoverImage,
+  getCoverGenerations,
+} from '../actions';
 
 interface PrintJob {
   id: string;
@@ -143,7 +165,9 @@ export default function ProjectWorkspace({
   const [editorTone, setEditorTone] = useState('professional');
   const [isDragging, setIsDragging] = useState(false);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
-  const [coverGenerations, setCoverGenerations] = useState<CoverGeneration[]>(initialCoverGenerations);
+  const [coverGenerations, setCoverGenerations] = useState<CoverGeneration[]>(
+    initialCoverGenerations
+  );
   const { preview, setPreview } = useFilePreview();
   const pathname = usePathname();
   const isProjectPage = pathname?.startsWith('/dashboard/project/');
@@ -179,10 +203,10 @@ export default function ProjectWorkspace({
     try {
       const arrayBuffer = await file.arrayBuffer();
       const { value: rawText } = await mammoth.extractRawText({ arrayBuffer });
-      
+
       // Update project content
       await updateProject(project.id, { content: rawText });
-      
+
       // Refresh the page to show updated content
       window.location.reload();
     } catch (error) {
@@ -236,16 +260,16 @@ export default function ProjectWorkspace({
   };
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col h-full w-full relative">
       <main className="flex-1 w-full flex flex-col min-h-0">
         {/* File Preview - Show on top when preview exists */}
-        {isProjectPage && preview && (
-          ((activeTab === 'print' || activeTab === 'ebook') && preview.type === 'pdf') ||
+        {isProjectPage &&
+        preview &&
+        (((activeTab === 'print' || activeTab === 'ebook') &&
+          preview.type === 'pdf') ||
           (activeTab === 'audio' && preview.type === 'audio') ||
-          (activeTab === 'cover' && preview.type === 'cover') ||
-          (activeTab === 'edit' && preview.type === 'manuscript')
-        ) ? (
-          <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800">
+          (activeTab === 'cover' && preview.type === 'cover')) ? (
+          <div className="overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800 my-6">
             <div className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 px-4 py-2">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
@@ -272,7 +296,9 @@ export default function ProjectWorkspace({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => window.open(preview.url, '_blank')}>
+                    <DropdownMenuItem
+                      onClick={() => window.open(preview.url, '_blank')}
+                    >
                       <ExternalLink className="mr-2 h-4 w-4" />
                       Open in New Tab
                     </DropdownMenuItem>
@@ -339,7 +365,11 @@ export default function ProjectWorkspace({
                       Cover image will appear here
                     </p>
                     {preview.url && (
-                      <img src={preview.url} alt="Cover preview" className="max-w-full max-h-96 rounded-lg shadow-lg" />
+                      <img
+                        src={preview.url}
+                        alt="Cover preview"
+                        className="max-w-full max-h-96 rounded-lg shadow-lg"
+                      />
                     )}
                   </div>
                 </div>
@@ -348,210 +378,359 @@ export default function ProjectWorkspace({
           </div>
         ) : null}
 
+        {/* Top Navigation Tabs */}
+        {isProjectPage && (
+          <div className="sticky top-0 border-b border-sidebar-border bg-background/95 backdrop-blur-sm z-10 shrink-0 h-12 flex items-center -mx-4 px-0">
+            <div className="flex items-center w-full h-full">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveTab('edit')}
+                className={`flex items-center justify-center gap-2.5 h-full flex-1 rounded-none font-medium transition-colors hover:!bg-zinc-100 dark:hover:!bg-zinc-800 ${
+                  activeTab === 'edit'
+                    ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold'
+                    : 'text-zinc-900 dark:text-zinc-100'
+                }`}
+              >
+                <FileEdit
+                  className={`h-5 w-5 ${
+                    activeTab === 'edit'
+                      ? ''
+                      : 'text-zinc-900 dark:text-zinc-100'
+                  }`}
+                />
+                Edit
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveTab('cover')}
+                className={`flex items-center justify-center gap-2.5 h-full flex-1 rounded-none font-medium transition-colors hover:!bg-zinc-100 dark:hover:!bg-zinc-800 ${
+                  activeTab === 'cover'
+                    ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold'
+                    : 'text-zinc-900 dark:text-zinc-100'
+                }`}
+              >
+                <Palette
+                  className={`h-5 w-5 ${
+                    activeTab === 'cover'
+                      ? ''
+                      : 'text-zinc-900 dark:text-zinc-100'
+                  }`}
+                />
+                Cover
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveTab('print')}
+                className={`flex items-center justify-center gap-2.5 h-full flex-1 rounded-none font-medium transition-colors hover:!bg-zinc-100 dark:hover:!bg-zinc-800 ${
+                  activeTab === 'print'
+                    ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold'
+                    : 'text-zinc-900 dark:text-zinc-100'
+                }`}
+              >
+                <BookOpen
+                  className={`h-5 w-5 ${
+                    activeTab === 'print'
+                      ? ''
+                      : 'text-zinc-900 dark:text-zinc-100'
+                  }`}
+                />
+                Print
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveTab('ebook')}
+                className={`flex items-center justify-center gap-2.5 h-full flex-1 rounded-none font-medium transition-colors hover:!bg-zinc-100 dark:hover:!bg-zinc-800 ${
+                  activeTab === 'ebook'
+                    ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold'
+                    : 'text-zinc-900 dark:text-zinc-100'
+                }`}
+              >
+                <Tablet
+                  className={`h-5 w-5 ${
+                    activeTab === 'ebook'
+                      ? ''
+                      : 'text-zinc-900 dark:text-zinc-100'
+                  }`}
+                />
+                E-book
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveTab('audio')}
+                className={`flex items-center justify-center gap-2.5 h-full flex-1 rounded-none font-medium transition-colors hover:!bg-zinc-100 dark:hover:!bg-zinc-800 ${
+                  activeTab === 'audio'
+                    ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-semibold'
+                    : 'text-zinc-900 dark:text-zinc-100'
+                }`}
+              >
+                <Mic
+                  className={`h-5 w-5 ${
+                    activeTab === 'audio'
+                      ? ''
+                      : 'text-zinc-900 dark:text-zinc-100'
+                  }`}
+                />
+                Audiobook
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Production Studio - Content Area */}
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'edit' && (
-            <div>
-            {/* Show selected manuscript indicator */}
-            {preview && preview.type === 'manuscript' && (
-              <div className="mb-4 p-3 rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/50">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-                    <span className="text-sm font-medium text-violet-900 dark:text-violet-100">
-                      Selected: {preview.name}
-                    </span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setPreview(null)}
-                    className="h-7 text-xs"
-                  >
-                    <X className="h-3 w-3 mr-1" />
-                    Clear
-                  </Button>
+            <div className="py-6">
+              <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-violet-700 to-violet-800 hover:from-violet-700/95 hover:to-violet-800/95 text-left max-w-2xl transition-all">
+                <div className="absolute top-4 right-4">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
+                      >
+                        <Settings className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="w-72">
+                      <div className="space-y-4">
+                        <div>
+                          <Label
+                            htmlFor="editor-focus"
+                            className="text-sm font-medium mb-2 block"
+                          >
+                            Focus Area
+                          </Label>
+                          <Select
+                            value={editorFocus}
+                            onValueChange={setEditorFocus}
+                          >
+                            <SelectTrigger id="editor-focus" size="sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Areas</SelectItem>
+                              <SelectItem value="dramaturgy">
+                                Dramaturgy
+                              </SelectItem>
+                              <SelectItem value="style">Style</SelectItem>
+                              <SelectItem value="spelling">Spelling</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground mt-1.5">
+                            Choose what to analyze
+                          </p>
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="editor-language"
+                            className="text-sm font-medium mb-2 block"
+                          >
+                            Language
+                          </Label>
+                          <Select
+                            value={editorLanguage}
+                            onValueChange={setEditorLanguage}
+                          >
+                            <SelectTrigger id="editor-language" size="sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="en">English</SelectItem>
+                              <SelectItem value="es">Spanish</SelectItem>
+                              <SelectItem value="fr">French</SelectItem>
+                              <SelectItem value="de">German</SelectItem>
+                              <SelectItem value="it">Italian</SelectItem>
+                              <SelectItem value="pt">Portuguese</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground mt-1.5">
+                            Language for analysis
+                          </p>
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="editor-depth"
+                            className="text-sm font-medium mb-2 block"
+                          >
+                            Analysis Depth
+                          </Label>
+                          <Select
+                            value={editorDepth}
+                            onValueChange={setEditorDepth}
+                          >
+                            <SelectTrigger id="editor-depth" size="sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="quick">Quick</SelectItem>
+                              <SelectItem value="standard">Standard</SelectItem>
+                              <SelectItem value="thorough">Thorough</SelectItem>
+                              <SelectItem value="comprehensive">
+                                Comprehensive
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground mt-1.5">
+                            Level of detail in feedback
+                          </p>
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="editor-tone"
+                            className="text-sm font-medium mb-2 block"
+                          >
+                            Tone Preference
+                          </Label>
+                          <Select
+                            value={editorTone}
+                            onValueChange={setEditorTone}
+                          >
+                            <SelectTrigger id="editor-tone" size="sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="professional">
+                                Professional
+                              </SelectItem>
+                              <SelectItem value="casual">Casual</SelectItem>
+                              <SelectItem value="academic">Academic</SelectItem>
+                              <SelectItem value="creative">Creative</SelectItem>
+                              <SelectItem value="conversational">
+                                Conversational
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground mt-1.5">
+                            Preferred writing tone
+                          </p>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </div>
-              </div>
-            )}
-            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-violet-700 to-violet-800 hover:from-violet-700/95 hover:to-violet-800/95 text-left max-w-3xl transition-all">
-              <div className="absolute top-4 right-4">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
+                <div className="flex items-start gap-4 mb-5">
+                  <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-[1.02]">
+                    <Sparkles className="h-7 w-7 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-xl text-white mb-2">
+                      Editor
+                    </h3>
+                    <p className="text-sm text-white/90 leading-relaxed">
+                      Get intelligent feedback on dramaturgy, style, and
+                      spelling. Improve your manuscript with professional
+                      editing insights.
+                    </p>
+                  </div>
+                </div>
+                <div className="text-sm text-white/80 mb-5 space-y-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>Dramaturgy analysis</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>Style suggestions</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>Spelling & grammar check</span>
+                  </div>
+                </div>
+                <div className="pt-4 border-t border-white/20 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button
+                      onClick={() => {
+                        // TODO: Implement dramaturgy analysis
+                        console.log('Dramaturgy analysis clicked');
+                      }}
+                      disabled={
+                        isGeneratingPrint || isGeneratingEbook || isUploading
+                      }
+                      className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Settings className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" className="w-72">
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="editor-focus" className="text-sm font-medium mb-2 block">Focus Area</Label>
-                        <Select value={editorFocus} onValueChange={setEditorFocus}>
-                          <SelectTrigger id="editor-focus" size="sm">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Areas</SelectItem>
-                            <SelectItem value="dramaturgy">Dramaturgy</SelectItem>
-                            <SelectItem value="style">Style</SelectItem>
-                            <SelectItem value="spelling">Spelling</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-muted-foreground mt-1.5">
-                          Choose what to analyze
-                        </p>
-                      </div>
-                      <div>
-                        <Label htmlFor="editor-language" className="text-sm font-medium mb-2 block">Language</Label>
-                        <Select value={editorLanguage} onValueChange={setEditorLanguage}>
-                          <SelectTrigger id="editor-language" size="sm">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="en">English</SelectItem>
-                            <SelectItem value="es">Spanish</SelectItem>
-                            <SelectItem value="fr">French</SelectItem>
-                            <SelectItem value="de">German</SelectItem>
-                            <SelectItem value="it">Italian</SelectItem>
-                            <SelectItem value="pt">Portuguese</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-muted-foreground mt-1.5">
-                          Language for analysis
-                        </p>
-                      </div>
-                      <div>
-                        <Label htmlFor="editor-depth" className="text-sm font-medium mb-2 block">Analysis Depth</Label>
-                        <Select value={editorDepth} onValueChange={setEditorDepth}>
-                          <SelectTrigger id="editor-depth" size="sm">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="quick">Quick</SelectItem>
-                            <SelectItem value="standard">Standard</SelectItem>
-                            <SelectItem value="thorough">Thorough</SelectItem>
-                            <SelectItem value="comprehensive">Comprehensive</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-muted-foreground mt-1.5">
-                          Level of detail in feedback
-                        </p>
-                      </div>
-                      <div>
-                        <Label htmlFor="editor-tone" className="text-sm font-medium mb-2 block">Tone Preference</Label>
-                        <Select value={editorTone} onValueChange={setEditorTone}>
-                          <SelectTrigger id="editor-tone" size="sm">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="professional">Professional</SelectItem>
-                            <SelectItem value="casual">Casual</SelectItem>
-                            <SelectItem value="academic">Academic</SelectItem>
-                            <SelectItem value="creative">Creative</SelectItem>
-                            <SelectItem value="conversational">Conversational</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-muted-foreground mt-1.5">
-                          Preferred writing tone
-                        </p>
-                      </div>
+                      <FileEdit className="h-5 w-5 text-white mb-2" />
+                      <span className="text-xs font-medium text-white">
+                        Dramaturgy
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        // TODO: Implement style analysis
+                        console.log('Style analysis clicked');
+                      }}
+                      disabled={
+                        isGeneratingPrint || isGeneratingEbook || isUploading
+                      }
+                      className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Sparkles className="h-5 w-5 text-white mb-2" />
+                      <span className="text-xs font-medium text-white">
+                        Style
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        // TODO: Implement spelling check
+                        console.log('Spelling check clicked');
+                      }}
+                      disabled={
+                        isGeneratingPrint || isGeneratingEbook || isUploading
+                      }
+                      className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <FileText className="h-5 w-5 text-white mb-2" />
+                      <span className="text-xs font-medium text-white">
+                        Spelling
+                      </span>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Analysis Type
+                      </p>
+                      <p className="text-sm text-white/90">Intelligent</p>
                     </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="flex items-start gap-4 mb-5">
-                <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-[1.02]">
-                  <Sparkles className="h-7 w-7 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-xl text-white mb-2">Editor</h3>
-                  <p className="text-sm text-white/90 leading-relaxed">
-                    Get intelligent feedback on dramaturgy, style, and spelling. Improve your manuscript with professional editing insights.
-                  </p>
-                </div>
-              </div>
-              <div className="text-sm text-white/80 mb-5 space-y-2.5">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>Dramaturgy analysis</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>Style suggestions</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>Spelling & grammar check</span>
-                </div>
-              </div>
-              <div className="pt-4 border-t border-white/20 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <button
-                    onClick={() => {
-                      // TODO: Implement dramaturgy analysis
-                      console.log('Dramaturgy analysis clicked');
-                    }}
-                    disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
-                    className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <FileEdit className="h-5 w-5 text-white mb-2" />
-                    <span className="text-xs font-medium text-white">Dramaturgy</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      // TODO: Implement style analysis
-                      console.log('Style analysis clicked');
-                    }}
-                    disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
-                    className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Sparkles className="h-5 w-5 text-white mb-2" />
-                    <span className="text-xs font-medium text-white">Style</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      // TODO: Implement spelling check
-                      console.log('Spelling check clicked');
-                    }}
-                    disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
-                    className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/10 hover:bg-white/15 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <FileText className="h-5 w-5 text-white mb-2" />
-                    <span className="text-xs font-medium text-white">Spelling</span>
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Analysis Type</p>
-                    <p className="text-sm text-white/90">Intelligent</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Use Case</p>
-                    <p className="text-sm text-white/90">Writing improvement</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Coverage</p>
-                    <p className="text-sm text-white/90">Full manuscript</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Language</p>
-                    <p className="text-sm text-white/90">Multiple</p>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Use Case
+                      </p>
+                      <p className="text-sm text-white/90">
+                        Writing improvement
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Coverage
+                      </p>
+                      <p className="text-sm text-white/90">Full manuscript</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Language
+                      </p>
+                      <p className="text-sm text-white/90">Multiple</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-              
             </div>
           )}
 
           {activeTab === 'print' && (
-            <div>
-            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-emerald-700 to-emerald-800 hover:from-emerald-700/95 hover:to-emerald-800/95 text-left transition-all group h-full max-w-3xl">
-                <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
+            <div className="py-6">
+              <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-emerald-700 to-emerald-800 hover:from-emerald-700/95 hover:to-emerald-800/95 text-left transition-all group h-full max-w-2xl">
+                <div
+                  className="absolute top-4 right-4"
+                  onClick={e => e.stopPropagation()}
+                >
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -565,19 +744,32 @@ export default function ProjectWorkspace({
                     <PopoverContent align="end" className="w-64">
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="font-select-print" className="text-sm font-medium mb-2 block">Typography</Label>
-                          <Select value={selectedFont} onValueChange={(value) => setSelectedFont(value as FontKey)}>
+                          <Label
+                            htmlFor="font-select-print"
+                            className="text-sm font-medium mb-2 block"
+                          >
+                            Typography
+                          </Label>
+                          <Select
+                            value={selectedFont}
+                            onValueChange={value =>
+                              setSelectedFont(value as FontKey)
+                            }
+                          >
                             <SelectTrigger id="font-select-print" size="sm">
                               <SelectValue>
-                                {FONT_OPTIONS.find(f => f.key === selectedFont)?.name || selectedFont}
+                                {FONT_OPTIONS.find(f => f.key === selectedFont)
+                                  ?.name || selectedFont}
                               </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                              {FONT_OPTIONS.map((font) => (
+                              {FONT_OPTIONS.map(font => (
                                 <SelectItem key={font.key} value={font.key}>
                                   <div className="flex flex-col">
                                     <span>{font.name}</span>
-                                    <span className="text-xs text-muted-foreground">{font.description}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {font.description}
+                                    </span>
                                   </div>
                                 </SelectItem>
                               ))}
@@ -596,9 +788,12 @@ export default function ProjectWorkspace({
                     <BookOpen className="h-7 w-7 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-xl text-white mb-2">Print Book PDF</h3>
+                    <h3 className="font-semibold text-xl text-white mb-2">
+                      Print Book PDF
+                    </h3>
                     <p className="text-sm text-white/90 leading-relaxed">
-                      Standard 6x9&quot; layout with industry margins. Perfect for physical printing and distribution.
+                      Standard 6x9&quot; layout with industry margins. Perfect
+                      for physical printing and distribution.
                     </p>
                   </div>
                 </div>
@@ -619,7 +814,9 @@ export default function ProjectWorkspace({
                 <div className="mt-auto pt-4 border-t border-white/20 space-y-4">
                   <button
                     onClick={() => handleGenerateFromText('print')}
-                    disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
+                    disabled={
+                      isGeneratingPrint || isGeneratingEbook || isUploading
+                    }
                     className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white text-sm font-semibold hover:bg-white/25 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isGeneratingPrint ? (
@@ -633,654 +830,795 @@ export default function ProjectWorkspace({
                   </button>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                      <p className="text-xs font-medium text-white/70 mb-1">Format</p>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Format
+                      </p>
                       <p className="text-sm text-white/90">6x9&quot; PDF</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-white/70 mb-1">Use Case</p>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Use Case
+                      </p>
                       <p className="text-sm text-white/90">Physical printing</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-white/70 mb-1">Typical Size</p>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Typical Size
+                      </p>
                       <p className="text-sm text-white/90">~2-5 MB</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-white/70 mb-1">Margins</p>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Margins
+                      </p>
                       <p className="text-sm text-white/90">Standard</p>
                     </div>
                   </div>
                 </div>
               </div>
-              
             </div>
           )}
 
           {activeTab === 'ebook' && (
-            <div>
-            <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-cyan-700 to-cyan-800 hover:from-cyan-700/95 hover:to-cyan-800/95 text-left transition-all group h-full max-w-3xl">
-              <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
-                    >
-                      <Settings className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" className="w-64">
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="font-select-ebook" className="text-sm font-medium mb-2 block">Typography</Label>
-                        <Select value={selectedFont} onValueChange={(value) => setSelectedFont(value as FontKey)}>
-                          <SelectTrigger id="font-select-ebook" size="sm">
-                            <SelectValue>
-                              {FONT_OPTIONS.find(f => f.key === selectedFont)?.name || selectedFont}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {FONT_OPTIONS.map((font) => (
-                              <SelectItem key={font.key} value={font.key}>
-                                <div className="flex flex-col">
-                                  <span>{font.name}</span>
-                                  <span className="text-xs text-muted-foreground">{font.description}</span>
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-muted-foreground mt-1.5">
-                          Choose the font style for your eBook
-                        </p>
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="flex items-start gap-4 mb-5">
-                <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-[1.02]">
-                  <Tablet className="h-7 w-7 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-xl text-white mb-2">E-book PDF</h3>
-                  <p className="text-sm text-white/90 leading-relaxed">
-                    Digital-first A5 layout optimized for screens. Ideal for e-readers and tablets.
-                  </p>
-                </div>
-              </div>
-              <div className="text-sm text-white/80 mb-5 space-y-2.5">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>Screen-optimized layout</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>Reflowable text</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>E-reader compatible</span>
-                </div>
-              </div>
-              <div className="mt-auto pt-4 border-t border-white/20 space-y-4">
-                <button
-                  onClick={() => handleGenerateFromText('ebook')}
-                  disabled={isGeneratingPrint || isGeneratingEbook || isUploading}
-                  className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white text-sm font-semibold hover:bg-white/25 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            <div className="py-6">
+              <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-cyan-700 to-cyan-800 hover:from-cyan-700/95 hover:to-cyan-800/95 text-left transition-all group h-full max-w-2xl">
+                <div
+                  className="absolute top-4 right-4"
+                  onClick={e => e.stopPropagation()}
                 >
-                  {isGeneratingEbook ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Converting...
-                    </>
-                  ) : (
-                    'Generate E-book'
-                  )}
-                </button>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Format</p>
-                    <p className="text-sm text-white/90">A5 PDF</p>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
+                      >
+                        <Settings className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="w-64">
+                      <div className="space-y-4">
+                        <div>
+                          <Label
+                            htmlFor="font-select-ebook"
+                            className="text-sm font-medium mb-2 block"
+                          >
+                            Typography
+                          </Label>
+                          <Select
+                            value={selectedFont}
+                            onValueChange={value =>
+                              setSelectedFont(value as FontKey)
+                            }
+                          >
+                            <SelectTrigger id="font-select-ebook" size="sm">
+                              <SelectValue>
+                                {FONT_OPTIONS.find(f => f.key === selectedFont)
+                                  ?.name || selectedFont}
+                              </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              {FONT_OPTIONS.map(font => (
+                                <SelectItem key={font.key} value={font.key}>
+                                  <div className="flex flex-col">
+                                    <span>{font.name}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {font.description}
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground mt-1.5">
+                            Choose the font style for your eBook
+                          </p>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="flex items-start gap-4 mb-5">
+                  <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-[1.02]">
+                    <Tablet className="h-7 w-7 text-white" />
                   </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Use Case</p>
-                    <p className="text-sm text-white/90">Digital reading</p>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-xl text-white mb-2">
+                      E-book PDF
+                    </h3>
+                    <p className="text-sm text-white/90 leading-relaxed">
+                      Digital-first A5 layout optimized for screens. Ideal for
+                      e-readers and tablets.
+                    </p>
                   </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Typical Size</p>
-                    <p className="text-sm text-white/90">~1-3 MB</p>
+                </div>
+                <div className="text-sm text-white/80 mb-5 space-y-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>Screen-optimized layout</span>
                   </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Layout</p>
-                    <p className="text-sm text-white/90">Screen-optimized</p>
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>Reflowable text</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>E-reader compatible</span>
+                  </div>
+                </div>
+                <div className="mt-auto pt-4 border-t border-white/20 space-y-4">
+                  <button
+                    onClick={() => handleGenerateFromText('ebook')}
+                    disabled={
+                      isGeneratingPrint || isGeneratingEbook || isUploading
+                    }
+                    className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white text-sm font-semibold hover:bg-white/25 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isGeneratingEbook ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Converting...
+                      </>
+                    ) : (
+                      'Generate E-book'
+                    )}
+                  </button>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Format
+                      </p>
+                      <p className="text-sm text-white/90">A5 PDF</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Use Case
+                      </p>
+                      <p className="text-sm text-white/90">Digital reading</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Typical Size
+                      </p>
+                      <p className="text-sm text-white/90">~1-3 MB</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Layout
+                      </p>
+                      <p className="text-sm text-white/90">Screen-optimized</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>              
             </div>
           )}
 
           {activeTab === 'cover' && (
-            <div>
-              <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-orange-700 to-orange-800 hover:from-orange-700/95 hover:to-orange-800/95 text-left max-w-3xl transition-all">
-              <div className="absolute top-4 right-4">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-white/80 hover:text-white hover:bg-white/20"
+            <div className="py-6">
+              <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-orange-700 to-orange-800 hover:from-orange-700/95 hover:to-orange-800/95 text-left max-w-2xl transition-all">
+                <div className="absolute top-4 right-4">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-white/80 hover:text-white hover:bg-white/20"
+                      >
+                        <Settings className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="w-64">
+                      <div className="space-y-4">
+                        <div>
+                          <Label
+                            htmlFor="cover-model-select"
+                            className="text-sm font-medium mb-2 block"
+                          >
+                            Image Model
+                          </Label>
+                          <Select
+                            value={coverModel}
+                            onValueChange={setCoverModel}
+                          >
+                            <SelectTrigger id="cover-model-select" size="sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="nano-banana">
+                                Nano Banana
+                              </SelectItem>
+                              <SelectItem value="flux">Flux</SelectItem>
+                              <SelectItem value="dalle-3">DALL-E 3</SelectItem>
+                              <SelectItem value="midjourney">
+                                Midjourney
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground mt-1.5">
+                            Choose the generation model for cover creation
+                          </p>
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="cover-style-select"
+                            className="text-sm font-medium mb-2 block"
+                          >
+                            Style
+                          </Label>
+                          <Select
+                            value={coverStyle}
+                            onValueChange={setCoverStyle}
+                          >
+                            <SelectTrigger id="cover-style-select" size="sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="realistic">
+                                Realistic
+                              </SelectItem>
+                              <SelectItem value="illustrated">
+                                Illustrated
+                              </SelectItem>
+                              <SelectItem value="minimalist">
+                                Minimalist
+                              </SelectItem>
+                              <SelectItem value="vintage">Vintage</SelectItem>
+                              <SelectItem value="modern">Modern</SelectItem>
+                              <SelectItem value="fantasy">Fantasy</SelectItem>
+                              <SelectItem value="abstract">Abstract</SelectItem>
+                              <SelectItem value="photographic">
+                                Photographic
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground mt-1.5">
+                            Choose the visual style for the cover
+                          </p>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="flex items-start gap-4 mb-5">
+                  <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-105">
+                    <Palette className="h-7 w-7 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-xl text-white mb-2">
+                      Cover Design
+                    </h3>
+                    <p className="text-sm text-white/90 leading-relaxed">
+                      Intelligent book cover generation. Create stunning covers
+                      that capture your book's essence.
+                    </p>
+                  </div>
+                </div>
+                <div className="text-sm text-white/80 mb-5 space-y-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>Generated designs</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>Multiple style options</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>High-resolution output</span>
+                  </div>
+                </div>
+                <div className="pt-4 border-t border-white/20 space-y-4">
+                  <div>
+                    <Label
+                      htmlFor="cover-prompt"
+                      className="text-xs font-medium text-white/80 mb-2 block"
                     >
-                      <Settings className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" className="w-64">
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="cover-model-select" className="text-sm font-medium mb-2 block">Image Model</Label>
-                        <Select value={coverModel} onValueChange={setCoverModel}>
-                          <SelectTrigger id="cover-model-select" size="sm">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="nano-banana">Nano Banana</SelectItem>
-                            <SelectItem value="flux">Flux</SelectItem>
-                            <SelectItem value="dalle-3">DALL-E 3</SelectItem>
-                            <SelectItem value="midjourney">Midjourney</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-muted-foreground mt-1.5">
-                          Choose the generation model for cover creation
-                        </p>
-                      </div>
-                      <div>
-                        <Label htmlFor="cover-style-select" className="text-sm font-medium mb-2 block">Style</Label>
-                        <Select value={coverStyle} onValueChange={setCoverStyle}>
-                          <SelectTrigger id="cover-style-select" size="sm">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="realistic">Realistic</SelectItem>
-                            <SelectItem value="illustrated">Illustrated</SelectItem>
-                            <SelectItem value="minimalist">Minimalist</SelectItem>
-                            <SelectItem value="vintage">Vintage</SelectItem>
-                            <SelectItem value="modern">Modern</SelectItem>
-                            <SelectItem value="fantasy">Fantasy</SelectItem>
-                            <SelectItem value="abstract">Abstract</SelectItem>
-                            <SelectItem value="photographic">Photographic</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-muted-foreground mt-1.5">
-                          Choose the visual style for the cover
-                        </p>
-                      </div>
+                      Prompt
+                    </Label>
+                    <Textarea
+                      id="cover-prompt"
+                      value={coverPrompt}
+                      onChange={e => setCoverPrompt(e.target.value)}
+                      placeholder="Describe the cover design you want... (e.g., 'A mysterious forest at twilight with glowing fireflies')"
+                      className="bg-white/20 border-white/30 text-white placeholder:text-white/50 min-h-[80px] resize-none max-w-2xl"
+                      rows={3}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Format
+                      </p>
+                      <p className="text-sm text-white/90">PNG / JPG</p>
                     </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="flex items-start gap-4 mb-5">
-                <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-105">
-                  <Palette className="h-7 w-7 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-xl text-white mb-2">Cover Design</h3>
-                  <p className="text-sm text-white/90 leading-relaxed">
-                    Intelligent book cover generation. Create stunning covers that capture your book's essence.
-                  </p>
-                </div>
-              </div>
-              <div className="text-sm text-white/80 mb-5 space-y-2.5">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>Generated designs</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>Multiple style options</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>High-resolution output</span>
-                </div>
-              </div>
-              <div className="pt-4 border-t border-white/20 space-y-4">
-                <div>
-                  <Label htmlFor="cover-prompt" className="text-xs font-medium text-white/80 mb-2 block">Prompt</Label>
-                  <Textarea
-                    id="cover-prompt"
-                    value={coverPrompt}
-                    onChange={(e) => setCoverPrompt(e.target.value)}
-                    placeholder="Describe the cover design you want... (e.g., 'A mysterious forest at twilight with glowing fireflies')"
-                    className="bg-white/20 border-white/30 text-white placeholder:text-white/50 min-h-[80px] resize-none max-w-2xl"
-                    rows={3}
-                  />
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Format</p>
-                    <p className="text-sm text-white/90">PNG / JPG</p>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Use Case
+                      </p>
+                      <p className="text-sm text-white/90">Book covers</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Resolution
+                      </p>
+                      <p className="text-sm text-white/90">300 DPI+</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Dimensions
+                      </p>
+                      <p className="text-sm text-white/90">Standard sizes</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Use Case</p>
-                    <p className="text-sm text-white/90">Book covers</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Resolution</p>
-                    <p className="text-sm text-white/90">300 DPI+</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Dimensions</p>
-                    <p className="text-sm text-white/90">Standard sizes</p>
-                  </div>
-                </div>
-                <button
-                  onClick={async () => {
-                    if (!coverPrompt.trim()) {
-                      alert('Please enter a prompt for the cover design');
-                      return;
+                  <button
+                    onClick={async () => {
+                      if (!coverPrompt.trim()) {
+                        alert('Please enter a prompt for the cover design');
+                        return;
+                      }
+                      setIsGeneratingCover(true);
+                      try {
+                        // Incorporate style into the prompt
+                        const stylePrefix =
+                          coverStyle !== 'realistic'
+                            ? `, ${coverStyle} style`
+                            : '';
+                        const fullPrompt = `${coverPrompt}${stylePrefix}`;
+                        const coverUrl = await generateCoverImage(
+                          project.id,
+                          fullPrompt,
+                          coverModel
+                        );
+                        const newCover: CoverGeneration = {
+                          id: Date.now().toString(),
+                          project_id: project.id,
+                          cover_url: coverUrl,
+                          prompt: coverPrompt,
+                          model: coverModel,
+                          created_at: new Date().toISOString(),
+                          style: coverStyle,
+                        };
+                        setCoverGenerations([newCover, ...coverGenerations]);
+                        setPreview({
+                          url: coverUrl,
+                          type: 'cover',
+                          name: 'Generated Cover',
+                          format: 'image',
+                          projectTitle: project.title,
+                        });
+                      } catch (error) {
+                        console.error('Error generating cover:', error);
+                        alert('Failed to generate cover. Please try again.');
+                      } finally {
+                        setIsGeneratingCover(false);
+                      }
+                    }}
+                    disabled={
+                      isGeneratingPrint ||
+                      isGeneratingEbook ||
+                      isUploading ||
+                      isGeneratingCover ||
+                      !coverPrompt.trim()
                     }
-                    setIsGeneratingCover(true);
-                    try {
-                      // Incorporate style into the prompt
-                      const stylePrefix = coverStyle !== 'realistic' ? `, ${coverStyle} style` : '';
-                      const fullPrompt = `${coverPrompt}${stylePrefix}`;
-                      const coverUrl = await generateCoverImage(project.id, fullPrompt, coverModel);
-                      const newCover: CoverGeneration = {
-                        id: Date.now().toString(),
-                        project_id: project.id,
-                        cover_url: coverUrl,
-                        prompt: coverPrompt,
-                        model: coverModel,
-                        created_at: new Date().toISOString(),
-                        style: coverStyle,
-                      };
-                      setCoverGenerations([newCover, ...coverGenerations]);
-                      setPreview({
-                        url: coverUrl,
-                        type: 'cover',
-                        name: 'Generated Cover',
-                        format: 'image',
-                        projectTitle: project.title,
-                      });
-                    } catch (error) {
-                      console.error('Error generating cover:', error);
-                      alert('Failed to generate cover. Please try again.');
-                    } finally {
-                      setIsGeneratingCover(false);
-                    }
-                  }}
-                  disabled={isGeneratingPrint || isGeneratingEbook || isUploading || isGeneratingCover || !coverPrompt.trim()}
-                  className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white text-sm font-semibold hover:bg-white/25 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isGeneratingCover ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    'Design Cover'
-                  )}
-                </button>
-              </div>
+                    className="inline-flex items-center justify-center w-full px-6 py-3 rounded-xl bg-white/20 backdrop-blur-sm text-white text-sm font-semibold hover:bg-white/25 transition-all border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isGeneratingCover ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      'Design Cover'
+                    )}
+                  </button>
+                </div>
               </div>
 
               {/* Cover Gallery - Show template covers or generated covers */}
-            <div className="mt-6">
-              {coverGenerations.length === 0 ? (
-                <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-lg">Template Covers</CardTitle>
-                    <CardDescription className="text-sm">
-                      Browse template covers or generate a custom one using the prompt above
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                      {[
-                        { id: '1', title: 'Minimalist', description: 'Clean and simple design' },
-                        { id: '2', title: 'Abstract', description: 'Modern abstract art' },
-                        { id: '3', title: 'Nature', description: 'Natural landscapes' },
-                        { id: '4', title: 'Urban', description: 'Cityscapes and architecture' },
-                        { id: '5', title: 'Fantasy', description: 'Mystical and magical' },
-                        { id: '6', title: 'Vintage', description: 'Classic retro style' },
-                        { id: '7', title: 'Geometric', description: 'Bold shapes and patterns' },
-                        { id: '8', title: 'Photographic', description: 'Real photography' },
-                      ].map((template) => (
-                        <div
-                          key={template.id}
-                          className="group relative aspect-[2/3] rounded-xl border-2 border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer overflow-hidden shadow-sm hover:shadow-md"
-                          onClick={() => {
-                            // For templates, we could show a preview or use them as inspiration
-                            // For now, just show a placeholder
-                          }}
-                        >
-                          <div className="absolute inset-0 flex items-center justify-center p-4">
-                            <div className="text-center">
-                              <Palette className="h-8 w-8 mx-auto mb-2 text-zinc-400 dark:text-zinc-600 transition-transform group-hover:scale-110" />
-                              <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{template.title}</p>
+              <div className="mt-6">
+                {coverGenerations.length === 0 ? (
+                  <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-lg">Template Covers</CardTitle>
+                      <CardDescription className="text-sm">
+                        Browse template covers or generate a custom one using
+                        the prompt above
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        {[
+                          {
+                            id: '1',
+                            title: 'Minimalist',
+                            description: 'Clean and simple design',
+                          },
+                          {
+                            id: '2',
+                            title: 'Abstract',
+                            description: 'Modern abstract art',
+                          },
+                          {
+                            id: '3',
+                            title: 'Nature',
+                            description: 'Natural landscapes',
+                          },
+                          {
+                            id: '4',
+                            title: 'Urban',
+                            description: 'Cityscapes and architecture',
+                          },
+                          {
+                            id: '5',
+                            title: 'Fantasy',
+                            description: 'Mystical and magical',
+                          },
+                          {
+                            id: '6',
+                            title: 'Vintage',
+                            description: 'Classic retro style',
+                          },
+                          {
+                            id: '7',
+                            title: 'Geometric',
+                            description: 'Bold shapes and patterns',
+                          },
+                          {
+                            id: '8',
+                            title: 'Photographic',
+                            description: 'Real photography',
+                          },
+                        ].map(template => (
+                          <div
+                            key={template.id}
+                            className="group relative aspect-[2/3] rounded-xl border-2 border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-800 dark:to-zinc-900 hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer overflow-hidden shadow-sm hover:shadow-md"
+                            onClick={() => {
+                              // For templates, we could show a preview or use them as inspiration
+                              // For now, just show a placeholder
+                            }}
+                          >
+                            <div className="absolute inset-0 flex items-center justify-center p-4">
+                              <div className="text-center">
+                                <Palette className="h-8 w-8 mx-auto mb-2 text-zinc-400 dark:text-zinc-600 transition-transform group-hover:scale-110" />
+                                <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                                  {template.title}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <div className="absolute bottom-0 left-0 right-0 p-3 space-y-1">
-                              <p className="text-xs text-white font-medium">{template.title}</p>
-                              <p className="text-xs text-white/80 leading-tight">{template.description}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-lg">Generated Covers</CardTitle>
-                    <CardDescription className="text-sm">
-                      Your generated cover designs
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                      {coverGenerations.map((cover) => (
-                        <div
-                          key={cover.id}
-                          className="group relative aspect-[2/3] rounded-xl border-2 border-zinc-200 dark:border-zinc-800 overflow-hidden hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer shadow-sm hover:shadow-md"
-                          onClick={() => {
-                            setPreview({
-                              url: cover.cover_url,
-                              type: 'cover',
-                              name: 'Generated Cover',
-                              format: 'image',
-                              projectTitle: project.title,
-                            });
-                          }}
-                        >
-                          <img
-                            src={cover.cover_url}
-                            alt={cover.prompt || 'Generated cover'}
-                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <div className="absolute bottom-0 left-0 right-0 p-3 space-y-2">
-                              <p className="text-xs text-white font-medium line-clamp-2 leading-tight">{cover.prompt}</p>
-                              <div className="flex items-center gap-1.5">
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  className="h-7 text-xs px-2.5 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    window.open(cover.cover_url, '_blank');
-                                  }}
-                                >
-                                  <ExternalLink className="h-3 w-3 mr-1" />
-                                  Open
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="secondary"
-                                  className="h-7 text-xs px-2.5 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const link = document.createElement('a');
-                                    link.href = cover.cover_url;
-                                    link.download = `cover-${cover.id}.png`;
-                                    link.click();
-                                  }}
-                                >
-                                  <Download className="h-3 w-3 mr-1" />
-                                  Download
-                                </Button>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              <div className="absolute bottom-0 left-0 right-0 p-3 space-y-1">
+                                <p className="text-xs text-white font-medium">
+                                  {template.title}
+                                </p>
+                                <p className="text-xs text-white/80 leading-tight">
+                                  {template.description}
+                                </p>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-lg">
+                        Generated Covers
+                      </CardTitle>
+                      <CardDescription className="text-sm">
+                        Your generated cover designs
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        {coverGenerations.map(cover => (
+                          <div
+                            key={cover.id}
+                            className="group relative aspect-[2/3] rounded-xl border-2 border-zinc-200 dark:border-zinc-800 overflow-hidden hover:border-orange-500 dark:hover:border-orange-500 transition-all cursor-pointer shadow-sm hover:shadow-md"
+                            onClick={() => {
+                              setPreview({
+                                url: cover.cover_url,
+                                type: 'cover',
+                                name: 'Generated Cover',
+                                format: 'image',
+                                projectTitle: project.title,
+                              });
+                            }}
+                          >
+                            <img
+                              src={cover.cover_url}
+                              alt={cover.prompt || 'Generated cover'}
+                              className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              <div className="absolute bottom-0 left-0 right-0 p-3 space-y-2">
+                                <p className="text-xs text-white font-medium line-clamp-2 leading-tight">
+                                  {cover.prompt}
+                                </p>
+                                <div className="flex items-center gap-1.5">
+                                  <Button
+                                    size="sm"
+                                    variant="secondary"
+                                    className="h-7 text-xs px-2.5 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm"
+                                    onClick={e => {
+                                      e.stopPropagation();
+                                      window.open(cover.cover_url, '_blank');
+                                    }}
+                                  >
+                                    <ExternalLink className="h-3 w-3 mr-1" />
+                                    Open
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="secondary"
+                                    className="h-7 text-xs px-2.5 bg-white/10 hover:bg-white/20 text-white border-white/20 backdrop-blur-sm"
+                                    onClick={e => {
+                                      e.stopPropagation();
+                                      const link = document.createElement('a');
+                                      link.href = cover.cover_url;
+                                      link.download = `cover-${cover.id}.png`;
+                                      link.click();
+                                    }}
+                                  >
+                                    <Download className="h-3 w-3 mr-1" />
+                                    Download
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             </div>
           )}
 
           {activeTab === 'audio' && (
-            <div>
-              <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-rose-700 to-rose-800 hover:from-rose-700/95 hover:to-rose-800/95 text-left max-w-3xl transition-all">
-              <div className="absolute top-4 right-4">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
-                    >
-                      <Settings className="h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent align="end" className="w-64">
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="audio-advanced" className="text-sm font-medium mb-2 block">Advanced Settings</Label>
-                        <p className="text-xs text-muted-foreground">
-                          Additional configuration options coming soon
-                        </p>
+            <div className="py-6">
+              <div className="relative flex flex-col p-6 rounded-2xl bg-gradient-to-br from-rose-700 to-rose-800 hover:from-rose-700/95 hover:to-rose-800/95 text-left max-w-2xl transition-all">
+                <div className="absolute top-4 right-4">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-white/80 hover:text-white/90 hover:bg-white/10"
+                      >
+                        <Settings className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="w-64">
+                      <div className="space-y-4">
+                        <div>
+                          <Label
+                            htmlFor="audio-advanced"
+                            className="text-sm font-medium mb-2 block"
+                          >
+                            Advanced Settings
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            Additional configuration options coming soon
+                          </p>
+                        </div>
                       </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                <div className="flex items-start gap-4 mb-5">
+                  <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-105">
+                    <Mic className="h-7 w-7 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-xl text-white mb-2">
+                      Audiobook
+                    </h3>
+                    <p className="text-sm text-white/90 leading-relaxed">
+                      High-quality neural text-to-speech narration. Convert your
+                      manuscript into a professional audiobook.
+                    </p>
+                  </div>
+                </div>
+                <div className="text-sm text-white/80 mb-5 space-y-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>Natural-sounding voices</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>Multiple voice options</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
+                    <span>MP3 format</span>
+                  </div>
+                </div>
+                <div className="pt-4 border-t border-white/20 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <Label
+                        htmlFor="audio-model"
+                        className="text-xs font-medium text-white/80 mb-2 block"
+                      >
+                        Model
+                      </Label>
+                      <Select
+                        value={audioApi}
+                        onValueChange={value =>
+                          setAudioApi(value as 'openai' | 'elevenlabs')
+                        }
+                      >
+                        <SelectTrigger
+                          id="audio-model"
+                          className="bg-white/20 border-white/30 text-white h-9"
+                        >
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="openai">OpenAI</SelectItem>
+                          <SelectItem value="elevenlabs">ElevenLabs</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="flex items-start gap-4 mb-5">
-                <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-105">
-                  <Mic className="h-7 w-7 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-xl text-white mb-2">Audiobook</h3>
-                  <p className="text-sm text-white/90 leading-relaxed">
-                    High-quality neural text-to-speech narration. Convert your manuscript into a professional audiobook.
-                  </p>
-                </div>
-              </div>
-              <div className="text-sm text-white/80 mb-5 space-y-2.5">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>Natural-sounding voices</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>Multiple voice options</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0"></span>
-                  <span>MP3 format</span>
-                </div>
-              </div>
-              <div className="pt-4 border-t border-white/20 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div>
-                    <Label htmlFor="audio-model" className="text-xs font-medium text-white/80 mb-2 block">Model</Label>
-                    <Select value={audioApi} onValueChange={(value) => setAudioApi(value as 'openai' | 'elevenlabs')}>
-                      <SelectTrigger id="audio-model" className="bg-white/20 border-white/30 text-white h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="openai">OpenAI</SelectItem>
-                        <SelectItem value="elevenlabs">ElevenLabs</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div>
+                      <Label
+                        htmlFor="audio-voice"
+                        className="text-xs font-medium text-white/80 mb-2 block"
+                      >
+                        Voice
+                      </Label>
+                      <Select value={audioVoice} onValueChange={setAudioVoice}>
+                        <SelectTrigger
+                          id="audio-voice"
+                          className="bg-white/20 border-white/30 text-white h-9"
+                        >
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="alloy">Alloy</SelectItem>
+                          <SelectItem value="echo">Echo</SelectItem>
+                          <SelectItem value="fable">Fable</SelectItem>
+                          <SelectItem value="onyx">Onyx</SelectItem>
+                          <SelectItem value="nova">Nova</SelectItem>
+                          <SelectItem value="shimmer">Shimmer</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="audio-style"
+                        className="text-xs font-medium text-white/80 mb-2 block"
+                      >
+                        Style
+                      </Label>
+                      <Select value={audioStyle} onValueChange={setAudioStyle}>
+                        <SelectTrigger
+                          id="audio-style"
+                          className="bg-white/20 border-white/30 text-white h-9"
+                        >
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="natural">Natural</SelectItem>
+                          <SelectItem value="dramatic">Dramatic</SelectItem>
+                          <SelectItem value="conversational">
+                            Conversational
+                          </SelectItem>
+                          <SelectItem value="narrative">Narrative</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor="audio-voice" className="text-xs font-medium text-white/80 mb-2 block">Voice</Label>
-                    <Select value={audioVoice} onValueChange={setAudioVoice}>
-                      <SelectTrigger id="audio-voice" className="bg-white/20 border-white/30 text-white h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="alloy">Alloy</SelectItem>
-                        <SelectItem value="echo">Echo</SelectItem>
-                        <SelectItem value="fable">Fable</SelectItem>
-                        <SelectItem value="onyx">Onyx</SelectItem>
-                        <SelectItem value="nova">Nova</SelectItem>
-                        <SelectItem value="shimmer">Shimmer</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="audio-style" className="text-xs font-medium text-white/80 mb-2 block">Style</Label>
-                    <Select value={audioStyle} onValueChange={setAudioStyle}>
-                      <SelectTrigger id="audio-style" className="bg-white/20 border-white/30 text-white h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="natural">Natural</SelectItem>
-                        <SelectItem value="dramatic">Dramatic</SelectItem>
-                        <SelectItem value="conversational">Conversational</SelectItem>
-                        <SelectItem value="narrative">Narrative</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <ProjectActions projectId={project.id} />
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Format</p>
-                    <p className="text-sm text-white/90">MP3 Audio</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Use Case</p>
-                    <p className="text-sm text-white/90">Audiobook platforms</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Typical Size</p>
-                    <p className="text-sm text-white/90">~1-2 MB/min</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-white/70 mb-1">Duration</p>
-                    <p className="text-sm text-white/90">Varies</p>
+                  <ProjectActions projectId={project.id} />
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Format
+                      </p>
+                      <p className="text-sm text-white/90">MP3 Audio</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Use Case
+                      </p>
+                      <p className="text-sm text-white/90">
+                        Audiobook platforms
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Typical Size
+                      </p>
+                      <p className="text-sm text-white/90">~1-2 MB/min</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-white/70 mb-1">
+                        Duration
+                      </p>
+                      <p className="text-sm text-white/90">Varies</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             </div>
           )}
 
           {/* Empty State - Upload Section */}
           {isProjectPage && !preview && activeTab !== 'cover' && (
-          <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm p-0 mt-6">
-            <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              className={`min-h-[400px] flex flex-col items-center justify-center p-8 border border-dashed rounded-lg transition-colors ${
-                isDragging
-                  ? 'border-primary/50 bg-primary/5'
-                  : 'border-zinc-200/50 dark:border-zinc-800/50 hover:border-zinc-200/60 dark:hover:border-zinc-800/60 hover:bg-zinc-50/30 dark:hover:bg-zinc-900/30'
-              }`}
-            >
-              <div className="flex flex-col items-center gap-4 text-center max-w-md">
-                <div className={`p-4 rounded-full transition-colors ${
+            <Card className="border-zinc-200 dark:border-zinc-800 shadow-sm p-0 mt-6">
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`min-h-[400px] flex flex-col items-center justify-center p-8 border border-dashed rounded-lg transition-colors ${
                   isDragging
-                    ? 'bg-primary/10'
-                    : 'bg-zinc-100 dark:bg-zinc-800'
-                }`}>
-                  {isUploading ? (
-                    <Loader2 className="h-8 w-8 text-primary animate-spin" />
-                  ) : (
-                    <Upload className={`h-8 w-8 ${
-                      isDragging ? 'text-primary' : 'text-zinc-500'
-                    }`} />
+                    ? 'border-primary/50 bg-primary/5'
+                    : 'border-zinc-200/50 dark:border-zinc-800/50 hover:border-zinc-200/60 dark:hover:border-zinc-800/60 hover:bg-zinc-50/30 dark:hover:bg-zinc-900/30'
+                }`}
+              >
+                <div className="flex flex-col items-center gap-4 text-center max-w-md">
+                  <div
+                    className={`p-4 rounded-full transition-colors ${
+                      isDragging
+                        ? 'bg-primary/10'
+                        : 'bg-zinc-100 dark:bg-zinc-800'
+                    }`}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                    ) : (
+                      <Upload
+                        className={`h-8 w-8 ${
+                          isDragging ? 'text-primary' : 'text-zinc-500'
+                        }`}
+                      />
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-lg text-zinc-900 dark:text-white">
+                      {isUploading
+                        ? 'Uploading...'
+                        : isDragging
+                        ? 'Drop your file here'
+                        : 'Upload New Version'}
+                    </h3>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      {isUploading
+                        ? 'Processing your document...'
+                        : 'Click to select or drag and drop a .docx file to update the manuscript'}
+                    </p>
+                  </div>
+                  {!isUploading && (
+                    <>
+                      <input
+                        id="file-upload"
+                        type="file"
+                        className="hidden"
+                        accept=".docx,.doc"
+                        onChange={handleFileInput}
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          document.getElementById('file-upload')?.click()
+                        }
+                        className="mt-2"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Select Document
+                      </Button>
+                    </>
                   )}
                 </div>
-                <div className="space-y-2">
-                  <h3 className="font-semibold text-lg text-zinc-900 dark:text-white">
-                    {isUploading ? 'Uploading...' : isDragging ? 'Drop your file here' : 'Upload New Version'}
-                  </h3>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {isUploading
-                      ? 'Processing your document...'
-                      : 'Click to select or drag and drop a .docx file to update the manuscript'
-                    }
-                  </p>
-                </div>
-                {!isUploading && (
-                  <>
-                    <input
-                      id="file-upload"
-                      type="file"
-                      className="hidden"
-                      accept=".docx,.doc"
-                      onChange={handleFileInput}
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={() => document.getElementById('file-upload')?.click()}
-                      className="mt-2"
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      Select Document
-                    </Button>
-                  </>
-                )}
               </div>
-            </div>
-          </Card>
-        )}
-        </div>
-
-        {/* Sticky Bottom Navigation */}
-        <div className="sticky bottom-0 left-0 right-0 border-t border-sidebar-border bg-background/95 backdrop-blur-sm z-10 shrink-0 p-4 h-[72px] flex items-center">
-          <div className="flex items-center gap-1">
-            <Button
-              variant={activeTab === 'edit' ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('edit')}
-              className="flex items-center gap-2 h-10"
-            >
-              <FileEdit className="h-4 w-4" />
-              Edit
-            </Button>
-            <Button
-              variant={activeTab === 'cover' ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('cover')}
-              className="flex items-center gap-2 h-10"
-            >
-              <Palette className="h-4 w-4" />
-              Cover
-            </Button>
-            <Button
-              variant={activeTab === 'print' ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('print')}
-              className="flex items-center gap-2 h-10"
-            >
-              <BookOpen className="h-4 w-4" />
-              Print
-            </Button>
-            <Button
-              variant={activeTab === 'ebook' ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('ebook')}
-              className="flex items-center gap-2 h-10"
-            >
-              <Tablet className="h-4 w-4" />
-              E-book
-            </Button>
-            <Button
-              variant={activeTab === 'audio' ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => setActiveTab('audio')}
-              className="flex items-center gap-2 h-10"
-            >
-              <Mic className="h-4 w-4" />
-              Audiobook
-            </Button>
-          </div>
+            </Card>
+          )}
         </div>
       </main>
-
     </div>
   );
 }
-

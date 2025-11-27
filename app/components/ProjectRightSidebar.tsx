@@ -237,7 +237,7 @@ export function ProjectRightSidebar() {
             <span className="text-sm font-semibold">Binder</span>
           </SidebarHeader>
           <SidebarContent className="flex-1 overflow-y-auto overflow-x-hidden">
-            {/* Manuscript Versions - Moved to top */}
+            {/* Revisions - Moved to top */}
             <Collapsible 
               open={manuscriptVersionsOpen} 
               onOpenChange={setManuscriptVersionsOpen}
@@ -247,7 +247,7 @@ export function ProjectRightSidebar() {
                 <CollapsibleTrigger asChild>
                   <SidebarGroupLabel className="cursor-pointer hover:bg-sidebar-accent/50">
                     <ChevronDown className={`h-3 w-3 transition-transform ${manuscriptVersionsOpen ? 'rotate-0' : '-rotate-90'}`} />
-                    Manuscript Versions
+                    Revision
                     {manuscriptVersions.length > 0 && (
                       <SidebarMenuBadge>{manuscriptVersions.length}</SidebarMenuBadge>
                     )}
