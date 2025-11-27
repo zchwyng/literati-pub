@@ -21,17 +21,22 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Literati Pub',
   description: 'Convert your manuscripts into audiobooks with AI.',
+  alternates: {
+    languages: {
+      en: '/en',
+      sv: '/sv',
+    },
+  },
 };
 
 export default function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params?: { locale?: string };
 }>) {
-  const localeHeader = headers().get('x-locale');
-  const locale: Locale = i18n.locales.includes(localeHeader as Locale)
-    ? (localeHeader as Locale)
-    : i18n.defaultLocale;
+  const locale = params?.locale ?? 'en';
 
   return (
     <html lang={locale} suppressHydrationWarning>
