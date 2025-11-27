@@ -323,7 +323,7 @@ export function ProjectRightSidebar() {
                           disabled={loading}
                           className="group"
                         >
-                          <FileText className="h-4 w-4 shrink-0" />
+                          <FileText className="h-4 w-4 shrink-0 text-primary" />
                           <div className="flex flex-col items-start overflow-hidden">
                             <span className="truncate font-medium">{version.name}</span>
                             <span className="text-[10px] text-muted-foreground truncate">
@@ -338,7 +338,7 @@ export function ProjectRightSidebar() {
                                 className="opacity-0 group-hover:opacity-100 transition-opacity"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <MoreHorizontal className="h-4 w-4" />
+                                <MoreHorizontal className="h-4 w-4 text-primary" />
                                 <span className="sr-only">More options</span>
                               </button>
                             </DropdownMenuTrigger>
@@ -350,7 +350,7 @@ export function ProjectRightSidebar() {
                                 window.open(version.url, '_blank');
                               }}
                             >
-                              <ExternalLink className="mr-2 h-4 w-4" />
+                              <ExternalLink className="mr-2 h-4 w-4 text-primary" />
                               Open in new tab
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -362,7 +362,7 @@ export function ProjectRightSidebar() {
                                 link.click();
                               }}
                             >
-                              <Download className="mr-2 h-4 w-4" />
+                              <Download className="mr-2 h-4 w-4 text-primary" />
                               Download
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -430,7 +430,7 @@ export function ProjectRightSidebar() {
                           disabled={loading}
                           className="group"
                         >
-                          <Palette className="h-4 w-4 shrink-0" />
+                          <Palette className="h-4 w-4 shrink-0 text-primary" />
                           <span className="truncate">{cover.prompt || 'Cover'}</span>
                         </SidebarMenuButton>
                         <DropdownMenu>
@@ -440,7 +440,7 @@ export function ProjectRightSidebar() {
                                 className="opacity-0 group-hover:opacity-100 transition-opacity"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <MoreHorizontal className="h-4 w-4" />
+                                <MoreHorizontal className="h-4 w-4 text-primary" />
                                 <span className="sr-only">More options</span>
                               </button>
                             </DropdownMenuTrigger>
@@ -452,7 +452,7 @@ export function ProjectRightSidebar() {
                                 window.open(cover.cover_url, '_blank');
                               }}
                             >
-                              <ExternalLink className="mr-2 h-4 w-4" />
+                              <ExternalLink className="mr-2 h-4 w-4 text-primary" />
                               Open in new tab
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -464,7 +464,7 @@ export function ProjectRightSidebar() {
                                 link.click();
                               }}
                             >
-                              <Download className="mr-2 h-4 w-4" />
+                              <Download className="mr-2 h-4 w-4 text-primary" />
                               Download
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -531,7 +531,7 @@ export function ProjectRightSidebar() {
                           disabled={loading}
                           className="group"
                         >
-                          <Mic className="h-4 w-4 shrink-0" />
+                          <Mic className="h-4 w-4 shrink-0 text-primary" />
                           <span className="truncate">Audio Version</span>
                         </SidebarMenuButton>
                         <DropdownMenu>
@@ -541,7 +541,7 @@ export function ProjectRightSidebar() {
                                 className="opacity-0 group-hover:opacity-100 transition-opacity"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <MoreHorizontal className="h-4 w-4" />
+                                <MoreHorizontal className="h-4 w-4 text-primary" />
                                 <span className="sr-only">More options</span>
                               </button>
                             </DropdownMenuTrigger>
@@ -553,7 +553,7 @@ export function ProjectRightSidebar() {
                                 window.open(file.audio_url, '_blank');
                               }}
                             >
-                              <ExternalLink className="mr-2 h-4 w-4" />
+                              <ExternalLink className="mr-2 h-4 w-4 text-primary" />
                               Open in new tab
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -565,7 +565,7 @@ export function ProjectRightSidebar() {
                                 link.click();
                               }}
                             >
-                              <Download className="mr-2 h-4 w-4" />
+                              <Download className="mr-2 h-4 w-4 text-primary" />
                               Download
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -626,7 +626,7 @@ export function ProjectRightSidebar() {
                                   disabled={loading}
                                   className="group"
                                 >
-                                  <BookOpen className="h-4 w-4 shrink-0" />
+                                  <BookOpen className="h-4 w-4 shrink-0 text-primary" />
                                   <div className="flex flex-col items-start overflow-hidden">
                                     <span className="truncate font-medium">Print PDF</span>
                                     <span className="text-[10px] text-muted-foreground truncate">
@@ -641,7 +641,7 @@ export function ProjectRightSidebar() {
                                         className="opacity-0 group-hover:opacity-100 transition-opacity"
                                         onClick={(e) => e.stopPropagation()}
                                       >
-                                        <MoreHorizontal className="h-4 w-4" />
+                                        <MoreHorizontal className="h-4 w-4 text-primary" />
                                         <span className="sr-only">More options</span>
                                       </button>
                                     </DropdownMenuTrigger>
@@ -653,7 +653,7 @@ export function ProjectRightSidebar() {
                                         window.open(job.pdf_file_url, '_blank');
                                       }}
                                     >
-                                      <ExternalLink className="mr-2 h-4 w-4" />
+                                      <ExternalLink className="mr-2 h-4 w-4 text-primary" />
                                       Open in new tab
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
@@ -665,7 +665,7 @@ export function ProjectRightSidebar() {
                                         link.click();
                                       }}
                                     >
-                                      <Download className="mr-2 h-4 w-4" />
+                                      <Download className="mr-2 h-4 w-4 text-primary" />
                                       Download
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
@@ -761,7 +761,7 @@ export function ProjectRightSidebar() {
                                   disabled={loading}
                                   className="group"
                                 >
-                                  <Tablet className="h-4 w-4 shrink-0" />
+                                  <Tablet className="h-4 w-4 shrink-0 text-primary" />
                                   <div className="flex flex-col items-start overflow-hidden">
                                     <span className="truncate font-medium">E-book PDF</span>
                                     <span className="text-[10px] text-muted-foreground truncate">
@@ -776,7 +776,7 @@ export function ProjectRightSidebar() {
                                         className="opacity-0 group-hover:opacity-100 transition-opacity"
                                         onClick={(e) => e.stopPropagation()}
                                       >
-                                        <MoreHorizontal className="h-4 w-4" />
+                                        <MoreHorizontal className="h-4 w-4 text-primary" />
                                         <span className="sr-only">More options</span>
                                       </button>
                                     </DropdownMenuTrigger>
@@ -788,7 +788,7 @@ export function ProjectRightSidebar() {
                                         window.open(job.pdf_file_url, '_blank');
                                       }}
                                     >
-                                      <ExternalLink className="mr-2 h-4 w-4" />
+                                      <ExternalLink className="mr-2 h-4 w-4 text-primary" />
                                       Open in new tab
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
@@ -800,7 +800,7 @@ export function ProjectRightSidebar() {
                                         link.click();
                                       }}
                                     >
-                                      <Download className="mr-2 h-4 w-4" />
+                                      <Download className="mr-2 h-4 w-4 text-primary" />
                                       Download
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>

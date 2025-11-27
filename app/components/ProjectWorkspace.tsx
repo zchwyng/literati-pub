@@ -348,7 +348,7 @@ export default function ProjectWorkspace({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreHorizontal className="h-4 w-4" />
+                  <MoreHorizontal className="h-4 w-4 text-primary" />
                   <span className="sr-only">More options</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -356,7 +356,7 @@ export default function ProjectWorkspace({
                 <DropdownMenuItem
                   onClick={() => window.open(preview.url, '_blank')}
                 >
-                  <ExternalLink className="mr-2 h-4 w-4" />
+                  <ExternalLink className="mr-2 h-4 w-4 text-primary" />
                   Open in New Tab
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -367,7 +367,7 @@ export default function ProjectWorkspace({
                     link.click();
                   }}
                 >
-                  <Download className="mr-2 h-4 w-4" />
+                  <Download className="mr-2 h-4 w-4 text-primary" />
                   Download
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -563,7 +563,7 @@ export default function ProjectWorkspace({
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         >
-                          <Settings className="h-4 w-4" />
+                          <Settings className="h-5 w-5 text-primary" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-72">
@@ -734,7 +734,7 @@ export default function ProjectWorkspace({
                         }
                         className="flex flex-col items-center justify-center p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200 dark:border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <FileEdit className="h-5 w-5 text-foreground mb-2" />
+                        <FileEdit className="h-5 w-5 text-primary mb-2" />
                         <span className="text-xs font-medium text-foreground">
                           Dramaturgy
                         </span>
@@ -749,7 +749,7 @@ export default function ProjectWorkspace({
                         }
                         className="flex flex-col items-center justify-center p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200 dark:border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <Sparkles className="h-5 w-5 text-foreground mb-2" />
+                        <Sparkles className="h-5 w-5 text-primary mb-2" />
                         <span className="text-xs font-medium text-foreground">
                           Style
                         </span>
@@ -764,7 +764,7 @@ export default function ProjectWorkspace({
                         }
                         className="flex flex-col items-center justify-center p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200 dark:border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <FileText className="h-5 w-5 text-foreground mb-2" />
+                        <FileText className="h-5 w-5 text-primary mb-2" />
                         <span className="text-xs font-medium text-foreground">
                           Spelling
                         </span>
@@ -824,7 +824,7 @@ export default function ProjectWorkspace({
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         >
-                          <Settings className="h-4 w-4" />
+                          <Settings className="h-5 w-5 text-primary" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-64">
@@ -962,7 +962,7 @@ export default function ProjectWorkspace({
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         >
-                          <Settings className="h-4 w-4" />
+                          <Settings className="h-5 w-5 text-primary" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-64">
@@ -1099,7 +1099,7 @@ export default function ProjectWorkspace({
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         >
-                          <Settings className="h-4 w-4" />
+                          <Settings className="h-5 w-5 text-primary" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-64">
@@ -1492,7 +1492,7 @@ export default function ProjectWorkspace({
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         >
-                          <Settings className="h-4 w-4" />
+                          <Settings className="h-5 w-5 text-primary" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-64">

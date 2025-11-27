@@ -132,7 +132,7 @@ export function DashboardSidebar() {
                             className="opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <MoreHorizontal className="h-4 w-4" />
+                            <MoreHorizontal className="h-4 w-4 text-primary" />
                             <span className="sr-only">More options</span>
                           </button>
                         </DropdownMenuTrigger>

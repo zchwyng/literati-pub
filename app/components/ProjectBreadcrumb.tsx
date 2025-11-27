@@ -83,6 +83,7 @@ export function ProjectBreadcrumb() {
         href: '#',
         label: preview.name,
         isLast: true,
+        segment: 'preview',
       },
     ];
   }
