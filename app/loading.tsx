@@ -1,14 +1,8 @@
-import { headers } from 'next/headers';
-import { i18n, type Locale } from '../i18n-config';
+import { i18n } from '../i18n-config';
 
-export default async function Loading() {
-  const headersList = await headers();
-  const localeHeader = headersList.get('x-locale');
-  const locale: Locale = i18n.locales.includes(localeHeader as Locale)
-    ? (localeHeader as Locale)
-    : i18n.defaultLocale;
-
-  const label = locale === 'sv' ? 'Laddar...' : 'Loading...';
+export default function Loading() {
+  // Use default locale for loading state to avoid Suspense issues
+  const label = 'Loading...';
 
   return (
     <div className="flex h-screen w-screen items-center justify-center">

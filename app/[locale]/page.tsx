@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { stackServerApp } from '../../stack';
 import LandingUploader from '../components/LandingUploader';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
 import {
   BookOpen,
@@ -28,10 +29,11 @@ const featureIcons: Record<FeatureIcon, JSX.Element> = {
 };
 
 export default async function Home({
-  params: { locale },
+  params,
 }: {
-  params: { locale: Locale };
+  params: Promise<{ locale: Locale }>;
 }) {
+  const { locale } = await params;
   const user = await stackServerApp.getUser();
   const dictionary = await getDictionary(locale);
   const copyright = dictionary.footer.copyright.replace(
@@ -63,6 +65,7 @@ export default async function Home({
           </span>
         </div>
         <div className="flex gap-4 items-center">
+          <LanguageSwitcher />
           {user ? (
             <Button
               asChild

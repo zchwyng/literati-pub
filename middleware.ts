@@ -44,16 +44,8 @@ export function middleware(request: NextRequest) {
   const headers = new Headers(request.headers);
   headers.set('x-locale', activeLocale);
 
-  const pathnameWithoutLocale = pathname.replace(`/${activeLocale}`, '') || '/';
-
-  if (pathnameWithoutLocale !== '/') {
-    return NextResponse.rewrite(new URL(pathnameWithoutLocale, request.url), {
-      request: {
-        headers,
-      },
-    });
-  }
-
+  // For all routes with locale, pass through to Next.js
+  // Next.js will match app/[locale]/... routes
   return NextResponse.next({
     request: {
       headers,

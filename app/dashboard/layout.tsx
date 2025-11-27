@@ -7,6 +7,7 @@ import { ProjectRightSidebar, RightSidebarProvider, RightSidebarTrigger } from "
 import { ProjectBreadcrumb } from "../components/ProjectBreadcrumb"
 import { FilePreviewProvider } from "../components/FilePreviewContext"
 import { ThemeToggle } from "../components/ThemeToggle"
+import { LanguageSwitcher } from "../components/LanguageSwitcher"
 
 export default function DashboardLayout({
   children,
@@ -28,6 +29,7 @@ export default function DashboardLayout({
                 <div className="mr-2 h-4 w-px bg-zinc-200 dark:bg-zinc-800" />
                 <ProjectBreadcrumb />
                 <div className="ml-auto flex items-center gap-2">
+                  <LanguageSwitcher />
                   <ThemeToggle />
                   {isProjectPage && <RightSidebarTrigger />}
                 </div>
