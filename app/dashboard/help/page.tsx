@@ -6,7 +6,7 @@ export default function HelpPage() {
   const helpCategories = [
     {
       title: 'Getting Started',
-      description: 'Learn the basics of using Literati Pub',
+      description: 'Learn the basics of using Literati Publish',
       icon: BookOpen,
       articles: 12,
     },
@@ -56,7 +56,7 @@ export default function HelpPage() {
           Help & Documentation
         </h1>
         <p className="text-zinc-500 dark:text-zinc-400">
-          Find answers and learn how to make the most of Literati Pub
+          Find answers and learn how to make the most of Literati Publish
         </p>
       </div>
 

@@ -62,7 +62,7 @@ export default function FeedbackPage() {
                 Thank you for your feedback!
               </h2>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6 max-w-md">
-                We've received your message and will review it soon. Your input helps us improve Literati Pub.
+                We've received your message and will review it soon. Your input helps us improve Literati Publish.
               </p>
               <Button onClick={() => setIsSubmitted(false)}>
                 Submit Another
@@ -94,7 +94,7 @@ export default function FeedbackPage() {
             <div>
               <CardTitle>Send us your feedback</CardTitle>
               <CardDescription>
-                We'd love to hear from you. Your feedback helps us make Literati Pub better.
+                We'd love to hear from you. Your feedback helps us make Literati Publish better.
               </CardDescription>
             </div>
           </div>

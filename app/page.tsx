@@ -34,7 +34,7 @@ export default async function Home() {
             <ScrollText className="h-4 w-4" />
           </div>
           <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
-            Literati Pub
+            Literati Publish
           </span>
         </div>
         <div className="flex gap-4 items-center">
@@ -279,7 +279,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl mb-4">
-              Why writers choose Literati Pub
+              Why writers choose Literati Publish
             </h2>
             <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
               We obsessed over the indie author journey so you don&apos;t have to hire a team or learn new software.
@@ -311,7 +311,7 @@ export default async function Home() {
       <footer className="relative z-10 py-12 text-center text-sm text-zinc-600 dark:text-zinc-400 bg-zinc-50/50 dark:bg-black/50 border-t border-zinc-200 dark:border-zinc-800 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6">
           <p className="mb-4">
-            © {new Date().getFullYear()} Literati Pub. Built for the modern
+            © {new Date().getFullYear()} Literati Publish. Built for the modern
             author.
           </p>
           <div className="flex justify-center gap-6">

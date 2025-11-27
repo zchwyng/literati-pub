@@ -38,7 +38,7 @@ export default function ExamplesPage() {
           Examples
         </h1>
         <p className="text-zinc-500 dark:text-zinc-400">
-          Explore sample outputs to see what's possible with Literati Pub
+          Explore sample outputs to see what's possible with Literati Publish
         </p>
       </div>
 

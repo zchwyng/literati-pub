@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Literati Pub',
+  title: 'Literati Publish',
   description: 'Convert your manuscripts into audiobooks with AI.',
 };
 
