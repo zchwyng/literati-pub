@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { StackProvider, StackTheme } from '@stackframe/stack';
+import { headers } from 'next/headers';
 import { stackServerApp } from '../stack';
 import { ThemeProvider } from './components/ThemeProvider';
 import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
+import { i18n, type Locale } from '../i18n-config';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -32,8 +34,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = (headers().get('x-locale') as Locale | null) ?? i18n.defaultLocale;
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         {/* Preload Fonts for Preview */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
