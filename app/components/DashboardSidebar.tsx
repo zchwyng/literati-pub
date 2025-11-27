@@ -229,6 +229,17 @@ export function DashboardSidebar() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === "/dashboard/help/print-on-demand"}
+                >
+                  <Link href="/dashboard/help/print-on-demand">
+                    <FileCheck className="mr-2 h-4 w-4 text-primary" />
+                    <span>Print-on-Demand KB</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname === "/dashboard/feedback"}>
                   <Link href="/dashboard/feedback">
                     <MessageSquare className="mr-2 h-4 w-4 text-primary" />
