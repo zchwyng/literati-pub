@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { stackServerApp } from '../stack';
-import LandingUploader from './components/LandingUploader';
+import { stackServerApp } from '../../stack';
+import LandingUploader from '../components/LandingUploader';
 import { Button } from '@/components/ui/button';
 import {
   BookOpen,
@@ -13,9 +13,34 @@ import {
   ScrollText,
   Feather,
 } from 'lucide-react';
+import type { Locale } from '../../i18n-config';
+import { getDictionary } from '../../get-dictionary';
+import type { FeatureIcon } from '../../dictionaries/types';
+import type { ReactNode } from 'react';
 
-export default async function Home() {
+const featureIcons: Record<FeatureIcon, JSX.Element> = {
+  headphones: <Headphones className="h-8 w-8 text-primary" />,
+  printer: <Printer className="h-8 w-8 text-primary" />,
+  book: <BookOpen className="h-8 w-8 text-primary" />,
+  zap: <Zap className="h-8 w-8 text-primary" />,
+  sparkles: <Sparkles className="h-8 w-8 text-primary" />,
+  file: <FileText className="h-8 w-8 text-primary" />,
+};
+
+export default async function Home({
+  params: { locale },
+}: {
+  params: { locale: Locale };
+}) {
   const user = await stackServerApp.getUser();
+  const dictionary = await getDictionary(locale);
+  const copyright = dictionary.footer.copyright.replace(
+    '{year}',
+    String(new Date().getFullYear())
+  );
+
+  const localizedPath = (path: string) =>
+    path === '/' ? `/${locale}` : `/${locale}${path}`;
 
   return (
     <div className="relative min-h-screen font-sans">
@@ -34,7 +59,7 @@ export default async function Home() {
             <ScrollText className="h-4 w-4" />
           </div>
           <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
-            Literati Publish
+            {dictionary.nav.brand}
           </span>
         </div>
         <div className="flex gap-4 items-center">
@@ -44,7 +69,9 @@ export default async function Home() {
               variant="ghost"
               className="bg-white/50 dark:bg-black/50 hover:bg-white/80 dark:hover:bg-black/80 backdrop-blur-sm"
             >
-              <Link href="/dashboard">Dashboard</Link>
+              <Link href={localizedPath('/dashboard')}>
+                {dictionary.nav.dashboard}
+              </Link>
             </Button>
           ) : (
             <>
@@ -53,13 +80,17 @@ export default async function Home() {
                 variant="ghost"
                 className="hover:bg-white/20 dark:hover:bg-black/20"
               >
-                <Link href="/handler/sign-in">Sign In</Link>
+                <Link href={localizedPath('/handler/sign-in')}>
+                  {dictionary.nav.signIn}
+                </Link>
               </Button>
               <Button
                 asChild
                 className="rounded-full px-6 shadow-lg hover:shadow-md transition-all"
               >
-                <Link href="/handler/sign-up">Sign Up</Link>
+                <Link href={localizedPath('/handler/sign-up')}>
+                  {dictionary.nav.signUp}
+                </Link>
               </Button>
             </>
           )}
@@ -72,25 +103,21 @@ export default async function Home() {
           <div className="space-y-8">
             <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm text-primary backdrop-blur-md shadow-sm">
               <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
-              For indie authors and first-time writers
+              {dictionary.hero.badge}
             </div>
 
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-6xl font-bold tracking-tighter text-zinc-900 dark:text-white drop-shadow-sm leading-tight">
-                Turn your draft into a bookstore-ready book.
-                <span className="block text-primary">No formatting. No overwhelm.</span>
+                {dictionary.hero.title}
+                <span className="block text-primary">{dictionary.hero.highlight}</span>
               </h1>
               <p className="text-lg sm:text-xl text-zinc-700 dark:text-zinc-300 max-w-2xl leading-relaxed font-medium text-pretty">
-                Upload the story you&apos;ve been dreaming about. We polish it into an audiobook and a print-ready novel that meets industry standards—so you can finally hold your book and share it with readers.
+                {dictionary.hero.description}
               </p>
             </div>
 
             <div className="flex flex-wrap gap-3 text-sm text-zinc-600 dark:text-zinc-300">
-              {[
-                'Upload your Word doc, we handle the specs',
-                'Narration tuned for tone and emotion',
-                'Print PDFs ready for Amazon KDP & IngramSpark',
-              ].map((item) => (
+              {dictionary.hero.checklist.map((item) => (
                 <span
                   key={item}
                   className="inline-flex items-center gap-2 rounded-full bg-white/80 dark:bg-zinc-900/60 px-3 py-2 border border-zinc-200 dark:border-zinc-800 shadow-sm"
@@ -105,22 +132,18 @@ export default async function Home() {
               <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/60 backdrop-blur-lg shadow-lg p-4">
                 <LandingUploader />
                 <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400 font-medium">
-                  Free to start. Your first project is on us.
+                  {dictionary.hero.uploaderNote}
                 </p>
               </div>
               <div className="flex flex-wrap gap-4 text-sm text-zinc-600 dark:text-zinc-400">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-primary/15 flex items-center justify-center text-primary font-semibold">
-                    1
+                {dictionary.hero.quickSteps.map((step, index) => (
+                  <div key={step} className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full bg-primary/15 flex items-center justify-center text-primary font-semibold">
+                      {index + 1}
+                    </div>
+                    {step}
                   </div>
-                  Idea to final files in minutes
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-primary/15 flex items-center justify-center text-primary font-semibold">
-                    2
-                  </div>
-                  Keep ownership of every file
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -133,24 +156,27 @@ export default async function Home() {
                   <Feather className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">Indie launchpad</p>
-                  <h3 className="text-xl font-semibold text-zinc-900 dark:text-white">From manuscript to market</h3>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    {dictionary.hero.cardLabel}
+                  </p>
+                  <h3 className="text-xl font-semibold text-zinc-900 dark:text-white">
+                    {dictionary.hero.cardTitle}
+                  </h3>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                {[
-                  { label: 'Audiobook chapters', value: 'Ready in ~10 min' },
-                  { label: 'Print layout', value: '6x9” novel PDF' },
-                  { label: 'Compliance', value: 'ACX + KDP specs' },
-                  { label: 'Control', value: 'Download & own everything' },
-                ].map((stat) => (
+                {dictionary.hero.stats.map((stat) => (
                   <div
                     key={stat.label}
                     className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/60 p-4"
                   >
-                    <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{stat.label}</p>
-                    <p className="text-base font-semibold text-zinc-900 dark:text-white">{stat.value}</p>
+                    <p className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                      {stat.label}
+                    </p>
+                    <p className="text-base font-semibold text-zinc-900 dark:text-white">
+                      {stat.value}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -158,10 +184,10 @@ export default async function Home() {
               <div className="rounded-2xl bg-primary/10 p-6 border border-primary/20 space-y-3">
                 <div className="flex items-center gap-3 text-primary font-semibold">
                   <Sparkles className="h-5 w-5" />
-                  Built for writers who never want to touch InDesign.
+                  {dictionary.hero.promiseTitle}
                 </div>
                 <p className="text-sm text-zinc-700 dark:text-zinc-300">
-                  Upload once, preview, and export polished files you can publish today. Keep writing—we&apos;ll handle the tech.
+                  {dictionary.hero.promiseDescription}
                 </p>
               </div>
             </div>
@@ -174,32 +200,17 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl mb-4">
-              Your writing journey, without the tech headaches
+              {dictionary.howItWorks.title}
             </h2>
             <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-              From the spark of an idea to a finished book you can share, every step is clear, fast, and author-friendly.
+              {dictionary.howItWorks.description}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <Step
-              number="1"
-              title="Upload and breathe"
-              description="Drop in your draft and skip the formatting rules. We clean, structure, and prep your story the moment it lands."
-              image="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80&auto=format&fit=crop"
-            />
-            <Step
-              number="2"
-              title="Choose your voice & look"
-              description="Pick narration that matches your tone and watch your chapters flow into a beautiful, print-ready layout. Preview before you export."
-              image="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&q=80&auto=format&fit=crop"
-            />
-            <Step
-              number="3"
-              title="Publish with confidence"
-              description="Export ACX-compliant audio and KDP-ready PDFs. No guessing, no rejections—just files you can upload today."
-              image="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80&auto=format&fit=crop"
-            />
+            {dictionary.howItWorks.steps.map((step) => (
+              <Step key={step.number} {...step} />
+            ))}
           </div>
         </div>
       </div>
@@ -209,66 +220,39 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl mb-4">
-              Crafted for writers who are publishing themselves
+              {dictionary.features.title}
             </h2>
             <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-              We took the painful parts of indie publishing and automated them—without losing the soul of your book.
+              {dictionary.features.description}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            <Feature
-              title="Voice that fits your story"
-              description="Cinema-grade AI narration tuned for pacing, emotion, and clarity. Hear your book as if a professional actor read it."
-              icon={<Headphones className="h-8 w-8 text-primary" />}
-              image="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=600&q=80&auto=format&fit=crop"
-            />
-            <Feature
-              title="Typesetting without the tutorials"
-              description="Automatic 6x9″ print layout with chapter breaks, ornaments, margins, and page numbers dialed to spec."
-              icon={<Printer className="h-8 w-8 text-primary" />}
-              image="https://images.unsplash.com/photo-1448932252197-d19750584e56?w=600&q=80&auto=format&fit=crop"
-            />
-            <Feature
-              title="Distribution ready files"
-              description="Export packages that pass ACX, KDP, and IngramSpark on the first try. No fiddling with file settings."
-              icon={<BookOpen className="h-8 w-8 text-primary" />}
-              image="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&q=80&auto=format&fit=crop"
-            />
-            <Feature
-              title="Fast enough for launch week"
-              description="Generate narration and print layout in minutes, not months. Perfect for hitting preorder dates or crowdfunding promises."
-              icon={<Zap className="h-8 w-8 text-primary" />}
-              image="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&q=80&auto=format&fit=crop"
-            />
-            <Feature
-              title="Yours to own"
-              description="No subscriptions or locked formats. Download the mastered audio and print files, keep your IP, and publish anywhere."
-              icon={<Sparkles className="h-8 w-8 text-primary" />}
-              image="https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&q=80&auto=format&fit=crop"
-            />
-            <Feature
-              title="Formats for every reader"
-              description="MP3 for audiobooks, PDF for print-on-demand, EPUB on the roadmap. Each output is optimized for quality and compatibility."
-              icon={<FileText className="h-8 w-8 text-primary" />}
-              image="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=600&q=80&auto=format&fit=crop"
-            />
+            {dictionary.features.items.map((feature) => (
+              <Feature
+                key={feature.title}
+                title={feature.title}
+                description={feature.description}
+                icon={featureIcons[feature.icon]}
+                image={feature.image}
+              />
+            ))}
           </div>
 
           <div className="rounded-3xl border border-primary/20 bg-primary/5 dark:bg-primary/10 p-8 lg:p-10 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-lg">
             <div className="space-y-3 max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/60 dark:bg-zinc-900/60 px-3 py-1 text-xs uppercase tracking-wide text-primary border border-primary/20">
-                built for authors, by authors
+                {dictionary.callout.tag}
               </div>
               <h3 className="text-2xl font-semibold text-zinc-900 dark:text-white">
-                You focus on the story. We&apos;ll package it for every shelf.
+                {dictionary.callout.title}
               </h3>
               <p className="text-base text-zinc-700 dark:text-zinc-300">
-                Preview narration, tweak pacing, and export ready-to-upload files in one sitting. No more juggling freelancers or learning design software.
+                {dictionary.callout.description}
               </p>
             </div>
             <Button asChild className="rounded-full px-6 shadow-lg hover:shadow-md transition-all">
-              <Link href="#">Start your first book</Link>
+              <Link href={localizedPath('#')}>{dictionary.callout.action}</Link>
             </Button>
           </div>
         </div>
@@ -279,30 +263,17 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl mb-4">
-              Why writers choose Literati Publish
+              {dictionary.benefits.title}
             </h2>
             <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-              We obsessed over the indie author journey so you don&apos;t have to hire a team or learn new software.
+              {dictionary.benefits.description}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <Benefit
-              title="Save launch budget"
-              description="Replace multiple freelancers with one workflow. Get pro-grade audio and print files for a fraction of the usual cost."
-            />
-            <Benefit
-              title="Confidence in every export"
-              description="Outputs are tuned to ACX, KDP, and Ingram specs, so you avoid rejections, delays, and re-upload fees."
-            />
-            <Benefit
-              title="Creative control stays yours"
-              description="You keep the master files and rights. Publish wide, run ads, or release special editions however you want."
-            />
-            <Benefit
-              title="Built for busy dreamers"
-              description="If you&apos;re writing before work or after bedtime, we&apos;ve got you. No complicated UI—just clear steps that ship your book."
-            />
+            {dictionary.benefits.items.map((benefit) => (
+              <Benefit key={benefit.title} {...benefit} />
+            ))}
           </div>
         </div>
       </div>
@@ -310,28 +281,25 @@ export default async function Home() {
       {/* Footer */}
       <footer className="relative z-10 py-12 text-center text-sm text-zinc-600 dark:text-zinc-400 bg-zinc-50/50 dark:bg-black/50 border-t border-zinc-200 dark:border-zinc-800 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="mb-4">
-            © {new Date().getFullYear()} Literati Publish. Built for the modern
-            author.
-          </p>
+          <p className="mb-4">{copyright}</p>
           <div className="flex justify-center gap-6">
             <Link
-              href="#"
+              href={localizedPath('#')}
               className="hover:text-zinc-900 dark:hover:text-white transition-colors"
             >
-              Privacy
+              {dictionary.footer.privacy}
             </Link>
             <Link
-              href="#"
+              href={localizedPath('#')}
               className="hover:text-zinc-900 dark:hover:text-white transition-colors"
             >
-              Terms
+              {dictionary.footer.terms}
             </Link>
             <Link
-              href="#"
+              href={localizedPath('#')}
               className="hover:text-zinc-900 dark:hover:text-white transition-colors"
             >
-              Contact
+              {dictionary.footer.contact}
             </Link>
           </div>
         </div>
@@ -348,7 +316,7 @@ function Feature({
 }: {
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   image?: string;
 }) {
   return (

@@ -19,15 +19,26 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Literati Publish',
   description: 'Convert your manuscripts into audiobooks with AI.',
+  alternates: {
+    languages: {
+      en: '/en',
+      sv: '/sv',
+    },
+  },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params?: Promise<{ locale?: string }>;
 }>) {
+  const resolvedParams = await params;
+  const locale = resolvedParams?.locale ?? 'en';
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         {/* Preload Fonts for Preview */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
