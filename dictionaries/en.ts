@@ -6,6 +6,7 @@ const dictionary: Dictionary = {
     dashboard: 'Dashboard',
     signIn: 'Sign In',
     signUp: 'Sign Up',
+    beta: 'Beta',
   },
   hero: {
     badge: 'For indie authors and first-time writers',

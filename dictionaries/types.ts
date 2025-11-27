@@ -6,6 +6,7 @@ export type Dictionary = {
     dashboard: string;
     signIn: string;
     signUp: string;
+    beta: string;
   };
   hero: {
     badge: string;

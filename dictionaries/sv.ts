@@ -6,6 +6,7 @@ const dictionary: Dictionary = {
     dashboard: 'Instrumentpanel',
     signIn: 'Logga in',
     signUp: 'Skapa konto',
+    beta: 'Beta',
   },
   hero: {
     badge: 'För indieförfattare och debutanter',
