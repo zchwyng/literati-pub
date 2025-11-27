@@ -13,6 +13,8 @@ const dictionary: Dictionary = {
     highlight: 'No formatting. No overwhelm.',
     description:
       "Upload the story you've been dreaming about. We polish it into an audiobook and a print-ready novel that meets industry standards—so you can finally hold your book and share it with readers.",
+    ctaPrimary: 'Start free',
+    ctaSecondary: 'See how it works',
     checklist: [
       'Upload your Word doc, we handle the specs',
       'Narration tuned for tone and emotion',
@@ -25,6 +27,11 @@ const dictionary: Dictionary = {
       { label: 'Print layout', value: '6x9” novel PDF' },
       { label: 'Compliance', value: 'ACX + KDP specs' },
       { label: 'Control', value: 'Download & own everything' },
+    ],
+    trustBar: [
+      { label: 'Audio delivery', detail: 'ACX peak-normalized masters' },
+      { label: 'Print layout', detail: 'KDP & IngramSpark compliant' },
+      { label: 'Timeline', detail: 'Export files in under an hour' },
     ],
     cardLabel: 'Indie launchpad',
     cardTitle: 'From manuscript to market',
@@ -124,6 +131,57 @@ const dictionary: Dictionary = {
     description:
       'Preview narration, tweak pacing, and export ready-to-upload files in one sitting. No more juggling freelancers or learning design software.',
     action: 'Start your first book',
+  },
+  useCases: {
+    tag: 'fits your launch',
+    title: 'Built for every publishing path',
+    description:
+      'Whether you are recording your first audiobook or prepping a print run for a preorder, Literati Pub adapts to the way you ship.',
+    items: [
+      {
+        badge: 'PenLine',
+        title: 'Drafting your first chapters',
+        description:
+          'Upload raw Word docs while you write. We keep your chapters tidy, versioned, and ready to export when you are.',
+      },
+      {
+        badge: 'Mic',
+        title: 'Audio-first storytellers',
+        description:
+          'Dial narration pacing, choose a voice, and export ACX-ready MP3s without booking a studio or learning DAWs.',
+      },
+      {
+        badge: 'Library',
+        title: 'Series authors & backlist',
+        description:
+          'Batch older titles into consistent print layouts and audio masters so every book in your universe feels cohesive.',
+      },
+    ],
+  },
+  testimonials: {
+    title: 'Authors shipping faster',
+    description:
+      'Indie writers and first-time authors use Literati Pub to skip the technical hurdles and get straight to publishing.',
+    items: [
+      {
+        quote:
+          '“I uploaded a messy draft and had a clean KDP PDF in the same afternoon. It felt like skipping three freelancers.”',
+        name: 'Ari, fantasy author',
+        role: 'Self-published trilogy',
+      },
+      {
+        quote:
+          '“The narration presets nailed my protagonist’s tone. Listening back felt like hearing a pro studio session I didn’t have to manage.”',
+        name: 'Dev, thriller writer',
+        role: 'Audio-first release',
+      },
+      {
+        quote:
+          '“Having ACX and KDP specs baked in removed the guesswork. I hit my preorder date instead of waiting for revision emails.”',
+        name: 'Mara, romance novelist',
+        role: 'Crowdfunded launch',
+      },
+    ],
   },
   benefits: {
     title: 'Why writers choose Literati Pub',
