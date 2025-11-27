@@ -13,6 +13,7 @@ import {
   Sparkles,
   ScrollText,
   Feather,
+  Quote,
 } from 'lucide-react';
 import type { Locale } from '../../i18n-config';
 import { getDictionary } from '../../get-dictionary';
@@ -193,6 +194,53 @@ export default async function Home({
                   {dictionary.hero.promiseDescription}
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Social Proof */}
+      <div className="relative z-10 pb-12">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-xl shadow-xl p-8 lg:p-12 space-y-10">
+            <div className="max-w-3xl space-y-3">
+              <p className="text-sm uppercase tracking-[0.18em] text-primary font-semibold">
+                {dictionary.socialProof.title}
+              </p>
+              <p className="text-lg text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                {dictionary.socialProof.description}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {dictionary.socialProof.logos.map((logo) => (
+                <div
+                  key={logo.name}
+                  className="flex items-center justify-center rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/60 px-4 py-3 text-sm font-semibold text-zinc-700 dark:text-zinc-200 shadow-sm"
+                >
+                  {logo.name}
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {dictionary.socialProof.testimonials.map((testimonial) => (
+                <div
+                  key={testimonial.name}
+                  className="relative h-full rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-gradient-to-br from-white/90 via-white/80 to-amber-50/70 dark:from-zinc-900/80 dark:via-zinc-900/70 dark:to-amber-950/40 p-6 shadow-lg"
+                >
+                  <Quote className="h-6 w-6 text-primary mb-4" />
+                  <p className="text-base text-zinc-800 dark:text-zinc-200 leading-relaxed mb-6">
+                    {testimonial.quote}
+                  </p>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-white">
+                      {testimonial.name}
+                    </p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400">{testimonial.role}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

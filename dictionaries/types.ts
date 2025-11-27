@@ -47,6 +47,12 @@ export type Dictionary = {
     description: string;
     items: { title: string; description: string }[];
   };
+  socialProof: {
+    title: string;
+    description: string;
+    logos: { name: string }[];
+    testimonials: { quote: string; name: string; role: string }[];
+  };
   footer: {
     privacy: string;
     terms: string;
