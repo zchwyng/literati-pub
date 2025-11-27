@@ -153,6 +153,35 @@ const dictionary: Dictionary = {
       },
     ],
   },
+  socialProof: {
+    title: 'Betrodd av indieförfattare som släpper sin första – och nästa – bok',
+    description:
+      'Skrivgrupper, berättarröster och småförlag använder Literati Pub för att gå snabbare från utkast till distribution.',
+    logos: [
+      { name: 'Indie Author Alliance' },
+      { name: 'Storycraft Labs' },
+      { name: 'Northwind Audio' },
+      { name: 'Midnight Sun Press' },
+      { name: 'First Draft Collective' },
+    ],
+    testimonials: [
+      {
+        quote: 'Det snabbaste sättet jag sett till ACX-klara kapitel. Känns som en studio i webbläsaren.',
+        name: 'Lena Ortiz',
+        role: 'Berättare och indieförfattare',
+      },
+      {
+        quote: 'Fick äntligen ut min följetong som pocket utan att slåss med layoutprogram eller frilansare.',
+        name: 'Marcus Hale',
+        role: 'Författare inom urban fantasy',
+      },
+      {
+        quote: 'Som att ha ett produktionsteam i bakfickan. Min skrivcirkel är helt såld.',
+        name: 'Priya Desai',
+        role: 'Organisatör, Riverfront Writers',
+      },
+    ],
+  },
   footer: {
     privacy: 'Integritet',
     terms: 'Villkor',

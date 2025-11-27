@@ -153,6 +153,35 @@ const dictionary: Dictionary = {
       },
     ],
   },
+  socialProof: {
+    title: 'Trusted by indie authors shipping their first—and next—books',
+    description:
+      'Writing groups, narrators, and small presses use Literati Pub to move faster from draft to distribution.',
+    logos: [
+      { name: 'Indie Author Alliance' },
+      { name: 'Storycraft Labs' },
+      { name: 'Northwind Audio' },
+      { name: 'Midnight Sun Press' },
+      { name: 'First Draft Collective' },
+    ],
+    testimonials: [
+      {
+        quote: 'The quickest path to ACX-ready chapters I have seen. Feels like a studio in my browser.',
+        name: 'Lena Ortiz',
+        role: 'Narrator & indie author',
+      },
+      {
+        quote: 'Finally shipped my serial as a paperback without wrestling with layout software or freelancers.',
+        name: 'Marcus Hale',
+        role: 'Urban fantasy writer',
+      },
+      {
+        quote: 'It feels like having a production team on standby. My critique group is obsessed.',
+        name: 'Priya Desai',
+        role: 'Organizer, Riverfront Writers',
+      },
+    ],
+  },
   footer: {
     privacy: 'Privacy',
     terms: 'Terms',
