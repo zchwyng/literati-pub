@@ -563,7 +563,7 @@ export default function ProjectWorkspace({
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         >
-                          <Settings className="h-5 w-5 text-primary" />
+                          <Settings className="h-6 w-6 text-primary" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-72">
@@ -824,7 +824,7 @@ export default function ProjectWorkspace({
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         >
-                          <Settings className="h-5 w-5 text-primary" />
+                          <Settings className="h-6 w-6 text-primary" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-64">
@@ -962,7 +962,7 @@ export default function ProjectWorkspace({
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         >
-                          <Settings className="h-5 w-5 text-primary" />
+                          <Settings className="h-6 w-6 text-primary" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-64">
@@ -1099,7 +1099,7 @@ export default function ProjectWorkspace({
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         >
-                          <Settings className="h-5 w-5 text-primary" />
+                          <Settings className="h-6 w-6 text-primary" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-64">
@@ -1492,7 +1492,7 @@ export default function ProjectWorkspace({
                           size="icon"
                           className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
                         >
-                          <Settings className="h-5 w-5 text-primary" />
+                          <Settings className="h-6 w-6 text-primary" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent align="end" className="w-64">
