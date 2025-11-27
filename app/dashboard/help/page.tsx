@@ -1,6 +1,7 @@
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { HelpCircle, BookOpen, Video, MessageCircle, FileText, ExternalLink, Search } from 'lucide-react';
+import { HelpCircle, BookOpen, Video, MessageCircle, FileText, ExternalLink, Search, FileCheck } from 'lucide-react';
 
 export default function HelpPage() {
   const helpCategories = [
@@ -73,6 +74,30 @@ export default function HelpPage() {
             </div>
             <Button>Search</Button>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mb-8 border-primary/20 bg-primary/5">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-white/70 rounded-lg shadow-sm">
+              <FileCheck className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <CardTitle>Print-on-demand knowledge base</CardTitle>
+              <CardDescription>
+                Compare KDP, IngramSpark, Lulu, D2D Print, and Blurb specs before you export files.
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-3">
+          <Button asChild>
+            <Link href="/dashboard/help/print-on-demand">Open publisher guide</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/dashboard/distribution">Review distribution settings</Link>
+          </Button>
         </CardContent>
       </Card>
 
