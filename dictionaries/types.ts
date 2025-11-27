@@ -13,10 +13,13 @@ export type Dictionary = {
     title: string;
     highlight: string;
     description: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
     checklist: string[];
     uploaderNote: string;
     quickSteps: string[];
     stats: { label: string; value: string }[];
+    trustBar: { label: string; detail: string }[];
     cardLabel: string;
     cardTitle: string;
     promiseTitle: string;
@@ -42,6 +45,17 @@ export type Dictionary = {
     title: string;
     description: string;
     action: string;
+  };
+  useCases: {
+    tag: string;
+    title: string;
+    description: string;
+    items: { badge: string; title: string; description: string }[];
+  };
+  testimonials: {
+    title: string;
+    description: string;
+    items: { quote: string; name: string; role: string }[];
   };
   benefits: {
     title: string;

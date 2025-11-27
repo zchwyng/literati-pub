@@ -14,6 +14,8 @@ const dictionary: Dictionary = {
     highlight: 'Ingen formatering. Ingen stress.',
     description:
       'Ladda upp berättelsen du drömt om. Vi förfinar den till en ljudbok och en tryckfärdig roman som följer branschens standarder—så att du äntligen kan hålla boken i handen och dela den med läsare.',
+    ctaPrimary: 'Börja gratis',
+    ctaSecondary: 'Se hur det fungerar',
     checklist: [
       'Ladda upp ditt Word-dokument, vi hanterar specifikationerna',
       'Berättarröst justerad för ton och känsla',
@@ -26,6 +28,11 @@ const dictionary: Dictionary = {
       { label: 'Trycklayout', value: '6x9” roman-PDF' },
       { label: 'Regelefterlevnad', value: 'ACX + KDP-specar' },
       { label: 'Kontroll', value: 'Ladda ner och äg allt' },
+    ],
+    trustBar: [
+      { label: 'Ljudleverans', detail: 'ACX-mastrar med peak-normalisering' },
+      { label: 'Trycklayout', detail: 'Kompatibel med KDP och IngramSpark' },
+      { label: 'Tidslinje', detail: 'Exportera filer på under en timme' },
     ],
     cardLabel: 'Startplatta för indieförfattare',
     cardTitle: 'Från manus till marknad',
@@ -125,6 +132,57 @@ const dictionary: Dictionary = {
     description:
       'Förhandslyssna, justera tempot och exportera filer redo att laddas upp på ett och samma ställe. Inget mer jonglerande av frilansare eller designprogram.',
     action: 'Starta din första bok',
+  },
+  useCases: {
+    tag: 'passar din lansering',
+    title: 'Byggt för varje publiceringsväg',
+    description:
+      'Oavsett om du spelar in din första ljudbok eller förbereder en tryckkörning inför en förhandsbokning anpassar sig Literati Pub efter hur du släpper.',
+    items: [
+      {
+        badge: 'PenLine',
+        title: 'När du skriver dina första kapitel',
+        description:
+          'Ladda upp råa Word-dokument medan du skriver. Vi håller kapitlen prydliga, versionshanterade och redo för export när du är det.',
+      },
+      {
+        badge: 'Mic',
+        title: 'Berättare som prioriterar ljud',
+        description:
+          'Justera berättartempo, välj röst och exportera ACX-klara MP3-filer utan att boka studio eller lära dig ljudprogram.',
+      },
+      {
+        badge: 'Library',
+        title: 'Serieförfattare och backlist',
+        description:
+          'Bearbeta äldre titlar till enhetliga trycklayouter och ljudmaster så att varje bok i ditt universum känns sammanhållen.',
+      },
+    ],
+  },
+  testimonials: {
+    title: 'Författare som publicerar snabbare',
+    description:
+      'Indieförfattare och debutanter använder Literati Pub för att hoppa över det tekniska och gå direkt till publicering.',
+    items: [
+      {
+        quote:
+          '”Jag laddade upp ett stökigt utkast och hade en ren KDP-PDF samma eftermiddag. Det kändes som att hoppa över tre frilansare.”',
+        name: 'Ari, fantasyförfattare',
+        role: 'Egenutgiven trilogi',
+      },
+      {
+        quote:
+          '”Berättarinställningarna satte tonen för min protagonist. Att lyssna tillbaka kändes som en proffsstudio jag slapp koordinera.”',
+        name: 'Dev, thrillerförfattare',
+        role: 'Ljudfokuserad release',
+      },
+      {
+        quote:
+          '”Att ACX- och KDP-krav finns inbyggda tog bort gissandet. Jag höll min förhandsbokning istället för att vänta på revisionsmejl.”',
+        name: 'Mara, romanceförfattare',
+        role: 'Crowdfundad lansering',
+      },
+    ],
   },
   benefits: {
     title: 'Därför väljer författare Literati Pub',

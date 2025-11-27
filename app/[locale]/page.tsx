@@ -14,6 +14,10 @@ import {
   Sparkles,
   ScrollText,
   Feather,
+  PenLine,
+  Library,
+  Mic,
+  Globe2,
 } from 'lucide-react';
 import type { Locale } from '../../i18n-config';
 import { getDictionary } from '../../get-dictionary';
@@ -125,6 +129,23 @@ export default async function Home({
               </p>
             </div>
 
+            <div className="flex flex-wrap gap-3">
+              <Button asChild className="rounded-full px-6 shadow-lg hover:shadow-md transition-all">
+                <Link href={localizedPath('/handler/sign-up')}>
+                  {dictionary.hero.ctaPrimary}
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-full px-6 border-primary/40 text-primary hover:bg-primary/10"
+              >
+                <Link href={localizedPath('#how-it-works')}>
+                  {dictionary.hero.ctaSecondary}
+                </Link>
+              </Button>
+            </div>
+
             <div className="flex flex-wrap gap-3 text-sm text-zinc-600 dark:text-zinc-300">
               {dictionary.hero.checklist.map((item) => (
                 <span
@@ -134,6 +155,23 @@ export default async function Home({
                   <CheckCircle2 className="h-4 w-4 text-primary" />
                   {item}
                 </span>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              {dictionary.hero.trustBar.map((item) => (
+                <div
+                  key={item.label}
+                  className="flex items-center gap-3 rounded-2xl bg-white/70 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 px-4 py-3 shadow-sm"
+                >
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <div className="flex flex-col">
+                    <span className="text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                      {item.label}
+                    </span>
+                    <span className="text-sm font-semibold text-zinc-900 dark:text-white">{item.detail}</span>
+                  </div>
+                </div>
               ))}
             </div>
 
@@ -204,8 +242,32 @@ export default async function Home({
         </div>
       </div>
 
+      {/* Use Cases */}
+      <div className="relative z-10 py-20 bg-white/70 dark:bg-zinc-950/60 backdrop-blur-xl border-y border-zinc-200 dark:border-zinc-800">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-12 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs uppercase tracking-wide text-primary border border-primary/20 mb-4">
+              {dictionary.useCases.tag}
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl mb-3">
+              {dictionary.useCases.title}
+            </h2>
+            <p className="text-lg text-zinc-600 dark:text-zinc-400">{dictionary.useCases.description}</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {dictionary.useCases.items.map((useCase) => (
+              <UseCase key={useCase.title} {...useCase} />
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* How It Works */}
-      <div className="relative z-10 py-24 bg-white/80 dark:bg-zinc-950/70 backdrop-blur-xl border-y border-zinc-200 dark:border-zinc-800">
+      <div
+        id="how-it-works"
+        className="relative z-10 py-24 bg-white/80 dark:bg-zinc-950/70 backdrop-blur-xl border-y border-zinc-200 dark:border-zinc-800"
+      >
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl mb-4">
@@ -282,6 +344,23 @@ export default async function Home({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {dictionary.benefits.items.map((benefit) => (
               <Benefit key={benefit.title} {...benefit} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials */}
+      <div className="relative z-10 py-24 bg-white/85 dark:bg-zinc-950/75 backdrop-blur-xl border-t border-zinc-200 dark:border-zinc-800">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl mb-4">
+              {dictionary.testimonials.title}
+            </h2>
+            <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">{dictionary.testimonials.description}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {dictionary.testimonials.items.map((testimonial) => (
+              <Testimonial key={testimonial.name} {...testimonial} />
             ))}
           </div>
         </div>
@@ -409,6 +488,61 @@ function Benefit({
         <p className="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">
           {description}
         </p>
+      </div>
+    </div>
+  );
+}
+
+function UseCase({
+  badge,
+  title,
+  description,
+}: {
+  badge: string;
+  title: string;
+  description: string;
+}) {
+  const iconMap: Record<string, JSX.Element> = {
+    Mic: <Mic className="h-5 w-5" />,
+    PenLine: <PenLine className="h-5 w-5" />,
+    Library: <Library className="h-5 w-5" />,
+    Globe2: <Globe2 className="h-5 w-5" />,
+  };
+
+  return (
+    <div className="flex flex-col gap-4 rounded-2xl bg-white/60 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 p-6 shadow-sm hover:-translate-y-1 transition-all">
+      <div className="flex items-center gap-2 text-primary font-semibold">
+        <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+          {iconMap[badge] || <Sparkles className="h-5 w-5" />}
+        </div>
+        <span className="uppercase text-xs tracking-wide">{badge}</span>
+      </div>
+      <div className="space-y-2">
+        <h3 className="text-xl font-semibold text-zinc-900 dark:text-white">{title}</h3>
+        <p className="text-base text-zinc-600 dark:text-zinc-400 leading-relaxed">{description}</p>
+      </div>
+    </div>
+  );
+}
+
+function Testimonial({
+  quote,
+  name,
+  role,
+}: {
+  quote: string;
+  name: string;
+  role: string;
+}) {
+  return (
+    <div className="relative p-6 rounded-2xl bg-white/60 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800 shadow-sm h-full">
+      <div className="absolute -top-4 left-6 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg">
+        “
+      </div>
+      <p className="text-base text-zinc-700 dark:text-zinc-300 leading-relaxed mb-6">{quote}</p>
+      <div className="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400">
+        <div className="font-semibold text-zinc-900 dark:text-white">{name}</div>
+        <div>{role}</div>
       </div>
     </div>
   );
