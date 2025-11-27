@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.73",
     "@formatjs/intl-localematcher": "^0.6.2",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-collapsible": "^1.1.12",
@@ -27,6 +28,7 @@
     "@stackframe/stack": "^2.8.52",
     "@types/pg": "^8.15.6",
     "@vercel/blob": "^2.0.0",
+    "ai": "^5.0.103",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.555.0",

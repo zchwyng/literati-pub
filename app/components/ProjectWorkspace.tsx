@@ -5,6 +5,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { createPrintJob, createPrintJobFromContent } from '../actions/print';
 import { FONTS, type FontKey } from '../lib/print-constants';
+import { useCompletion } from 'ai/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -230,6 +231,20 @@ export default function ProjectWorkspace({
   const [coverGenerations, setCoverGenerations] = useState<CoverGeneration[]>(
     initialCoverGenerations
   );
+  const {
+    completion: editorCompletion,
+    complete: runEditorCompletion,
+    isLoading: isEditorLoading,
+    input: editorInput,
+    setInput: setEditorInput,
+    handleInputChange: handleEditorInputChange,
+    setCompletion: setEditorCompletion,
+  } = useCompletion({
+    api: '/api/editor',
+  });
+  const [activeEditorMode, setActiveEditorMode] = useState<
+    'dramaturgy' | 'style' | 'spelling' | 'analysis'
+  >('analysis');
   const { preview, setPreview } = useFilePreview();
   const pathname = usePathname();
   const isProjectPage = pathname?.startsWith('/dashboard/project/');
@@ -253,6 +268,12 @@ export default function ProjectWorkspace({
       }
     }
   }, [preview]);
+
+  React.useEffect(() => {
+    if (!editorInput && project?.content) {
+      setEditorInput(project.content);
+    }
+  }, [editorInput, project?.content, setEditorInput]);
 
   const handleFileUpload = async (file: File) => {
     if (!file.name.match(/\.(docx|doc)$/i)) {
@@ -306,6 +327,38 @@ export default function ProjectWorkspace({
     }
   };
 
+  const handleEditorAnalysis = async (
+    mode: 'dramaturgy' | 'style' | 'spelling' | 'analysis'
+  ) => {
+    const promptToUse =
+      editorInput?.trim()?.slice(0, 8000) ||
+      project?.content?.slice(0, 8000) ||
+      '';
+
+    if (!promptToUse) {
+      alert('Add some manuscript text to analyze.');
+      return;
+    }
+
+    setActiveEditorMode(mode);
+    setEditorCompletion('');
+
+    try {
+      await runEditorCompletion(promptToUse, {
+        body: {
+          focus: editorFocus,
+          language: editorLanguage,
+          depth: editorDepth,
+          tone: editorTone,
+          mode,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      alert('Editor analysis failed. Please try again.');
+    }
+  };
+
   const handleGenerateFromText = async (format: 'print' | 'ebook') => {
     if (format === 'print') setIsGeneratingPrint(true);
     else setIsGeneratingEbook(true);
@@ -320,6 +373,14 @@ export default function ProjectWorkspace({
       else setIsGeneratingEbook(false);
     }
   };
+
+  const editorActionsDisabled =
+    isGeneratingPrint || isGeneratingEbook || isUploading || isEditorLoading;
+  const editorCharCount = editorInput?.length ?? 0;
+  const editorModeLabel =
+    activeEditorMode === 'analysis'
+      ? 'Full review'
+      : `${activeEditorMode.charAt(0).toUpperCase()}${activeEditorMode.slice(1)} focus`;
 
   // Preview component to be reused in tabs
   const PreviewCard = () => {
@@ -723,16 +784,53 @@ export default function ProjectWorkspace({
                     </div>
                   </div>
                   <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <button
-                        onClick={() => {
-                          // TODO: Implement dramaturgy analysis
-                          console.log('Dramaturgy analysis clicked');
-                        }}
-                        disabled={
-                          isGeneratingPrint || isGeneratingEbook || isUploading
+                    <div className="space-y-3">
+                      <Label
+                        htmlFor="editor-text"
+                        className="text-sm font-medium text-foreground"
+                      >
+                        Manuscript excerpt
+                      </Label>
+                      <Textarea
+                        id="editor-text"
+                        value={editorInput}
+                        onChange={handleEditorInputChange}
+                        maxLength={8000}
+                        placeholder={
+                          project?.content
+                            ? 'Refine the auto-filled manuscript excerpt or paste a specific chapter.'
+                            : 'Paste a chapter or section to get AI-powered editing feedback.'
                         }
-                        className="flex flex-col items-center justify-center p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200 dark:border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-background border-zinc-200 dark:border-zinc-800 text-foreground placeholder:text-muted-foreground min-h-[120px] resize-none"
+                      />
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>Paste up to 8,000 characters. Powered by the Vercel AI SDK.</span>
+                        <span>{Math.min(editorCharCount, 8000)}/8000</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 px-3 py-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        <span>
+                          {editorModeLabel} · {editorFocus === 'all' ? 'All areas' : editorFocus} · {editorDepth} depth · {editorTone} tone
+                        </span>
+                      </div>
+                      {isEditorLoading && (
+                        <div className="inline-flex items-center gap-1 text-primary">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          <span>Analyzing</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <button
+                        onClick={() => handleEditorAnalysis('dramaturgy')}
+                        disabled={editorActionsDisabled}
+                        className={`flex flex-col items-center justify-center p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200 dark:border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed ${
+                          activeEditorMode === 'dramaturgy'
+                            ? 'border-primary/50 bg-primary/5 dark:bg-primary/10 shadow-sm'
+                            : ''
+                        }`}
                       >
                         <FileEdit className="h-5 w-5 text-primary mb-2" />
                         <span className="text-xs font-medium text-foreground">
@@ -740,14 +838,13 @@ export default function ProjectWorkspace({
                         </span>
                       </button>
                       <button
-                        onClick={() => {
-                          // TODO: Implement style analysis
-                          console.log('Style analysis clicked');
-                        }}
-                        disabled={
-                          isGeneratingPrint || isGeneratingEbook || isUploading
-                        }
-                        className="flex flex-col items-center justify-center p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200 dark:border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => handleEditorAnalysis('style')}
+                        disabled={editorActionsDisabled}
+                        className={`flex flex-col items-center justify-center p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200 dark:border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed ${
+                          activeEditorMode === 'style'
+                            ? 'border-primary/50 bg-primary/5 dark:bg-primary/10 shadow-sm'
+                            : ''
+                        }`}
                       >
                         <Sparkles className="h-5 w-5 text-primary mb-2" />
                         <span className="text-xs font-medium text-foreground">
@@ -755,20 +852,62 @@ export default function ProjectWorkspace({
                         </span>
                       </button>
                       <button
-                        onClick={() => {
-                          // TODO: Implement spelling check
-                          console.log('Spelling check clicked');
-                        }}
-                        disabled={
-                          isGeneratingPrint || isGeneratingEbook || isUploading
-                        }
-                        className="flex flex-col items-center justify-center p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200 dark:border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => handleEditorAnalysis('spelling')}
+                        disabled={editorActionsDisabled}
+                        className={`flex flex-col items-center justify-center p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200 dark:border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed ${
+                          activeEditorMode === 'spelling'
+                            ? 'border-primary/50 bg-primary/5 dark:bg-primary/10 shadow-sm'
+                            : ''
+                        }`}
                       >
                         <FileText className="h-5 w-5 text-primary mb-2" />
                         <span className="text-xs font-medium text-foreground">
                           Spelling
                         </span>
                       </button>
+                      <button
+                        onClick={() => handleEditorAnalysis('analysis')}
+                        disabled={editorActionsDisabled}
+                        className={`flex flex-col items-center justify-center p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-200 dark:border-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed ${
+                          activeEditorMode === 'analysis'
+                            ? 'border-primary/50 bg-primary/5 dark:bg-primary/10 shadow-sm'
+                            : ''
+                        }`}
+                      >
+                        <Eye className="h-5 w-5 text-primary mb-2" />
+                        <span className="text-xs font-medium text-foreground">
+                          Full Review
+                        </span>
+                      </button>
+                    </div>
+                    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 p-4 space-y-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="h-5 w-5 text-primary" />
+                          <div className="flex flex-col">
+                            <span className="text-sm font-semibold text-foreground">
+                              AI feedback
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              Streaming insights from your manuscript in real time
+                            </span>
+                          </div>
+                        </div>
+                        {isEditorLoading && (
+                          <Badge variant="secondary" className="text-primary border-primary/40">
+                            <Loader2 className="h-3 w-3 mr-1 animate-spin" /> Analyzing
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800 bg-background/60 px-3 py-2 min-h-[140px] text-sm text-foreground whitespace-pre-wrap">
+                        {editorCompletion ? (
+                          editorCompletion
+                        ) : (
+                          <span className="text-muted-foreground">
+                            Choose a focus above to generate feedback for your manuscript.
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
