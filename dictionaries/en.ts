@@ -9,40 +9,45 @@ const dictionary: Dictionary = {
     beta: 'Beta',
   },
   hero: {
-    badge: 'For indie authors and first-time writers',
-    title: 'Turn your draft into a bookstore-ready book.',
-    highlight: 'No formatting. No overwhelm.',
+    badge: 'Now in open beta for indie authors',
+    title: 'Finish your book without wrestling with production.',
+    highlight: 'Audio, print, and export-ready in one workspace.',
     description:
-      "Upload the story you've been dreaming about. We polish it into an audiobook and a print-ready novel that meets industry standards—so you can finally hold your book and share it with readers.",
+      'Drop in your manuscript, choose the right narrator, and download files that meet ACX, KDP, and IngramSpark specs. No guesswork, no juggling tools.',
+    ctaPrimary: 'Start for free',
+    ctaSecondary: 'See how it works',
     checklist: [
-      'Upload your Word doc, we handle the specs',
-      'Narration tuned for tone and emotion',
-      'Print PDFs ready for Amazon KDP & IngramSpark',
+      'Drag-and-drop Word and Google Docs',
+      'Narration tuned to your genre and pacing',
+      'Print PDFs with trim, margins, and TOC handled',
     ],
-    uploaderNote: 'Free to start. Your first project is on us.',
-    quickSteps: ['Idea to final files in minutes', 'Keep ownership of every file'],
+    uploaderNote: 'Upload a sample chapter—no card required. Keep every export.',
+    quickSteps: [
+      'Prep, preview, and publish in one flow',
+      'Keep rights, masters, and distribution choices with you',
+    ],
     stats: [
-      { label: 'Audiobook chapters', value: 'Ready in ~10 min' },
-      { label: 'Print layout', value: '6x9” novel PDF' },
-      { label: 'Compliance', value: 'ACX + KDP specs' },
-      { label: 'Control', value: 'Download & own everything' },
+      { label: 'Audio drafts', value: 'Chapters ready in ~10 min' },
+      { label: 'Print layout', value: '6x9” & 5x8” exports' },
+      { label: 'Compliance', value: 'ACX + KDP aligned' },
+      { label: 'Control', value: 'Download everything' },
     ],
-    cardLabel: 'Indie launchpad',
-    cardTitle: 'From manuscript to market',
-    promiseTitle: 'Built for writers who never want to touch InDesign.',
+    cardLabel: 'Production cockpit',
+    cardTitle: 'Every deliverable side-by-side',
+    promiseTitle: 'Skip the software maze.',
     promiseDescription:
-      "Upload once, preview, and export polished files you can publish today. Keep writing—we'll handle the tech.",
+      'Upload once, preview narration and print, and export polished files today.',
   },
   howItWorks: {
-    title: 'Your writing journey, without the tech headaches',
+    title: 'See your book go from draft to deliverable',
     description:
-      "From the spark of an idea to a finished book you can share, every step is clear, fast, and author-friendly.",
+      'A guided path that keeps you writing while we handle specs, timing, and exports.',
     steps: [
       {
         number: '1',
         title: 'Upload and breathe',
         description:
-          'Drop in your draft and skip the formatting rules. We clean, structure, and prep your story the moment it lands.',
+          'Drop in your draft and skip the formatting rules. We clean, structure, and prep your story as soon as it lands.',
         image:
           'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=80&auto=format&fit=crop',
       },
@@ -50,7 +55,7 @@ const dictionary: Dictionary = {
         number: '2',
         title: 'Choose your voice & look',
         description:
-          'Pick narration that matches your tone and watch your chapters flow into a beautiful, print-ready layout. Preview before you export.',
+          'Pick narration that matches your tone and watch your chapters flow into a polished, print-ready layout. Preview before you export.',
         image:
           'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&q=80&auto=format&fit=crop',
       },
@@ -58,21 +63,21 @@ const dictionary: Dictionary = {
         number: '3',
         title: 'Publish with confidence',
         description:
-          'Export ACX-compliant audio and KDP-ready PDFs. No guessing, no rejections—just files you can upload today.',
+          'Export ACX-compliant audio and KDP-ready PDFs. No guessing, no rejections—just files ready to ship.',
         image:
           'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80&auto=format&fit=crop',
       },
     ],
   },
   features: {
-    title: 'Crafted for writers who are publishing themselves',
+    title: 'Built for the entire indie launch plan',
     description:
-      'We took the painful parts of indie publishing and automated them—without losing the soul of your book.',
+      'We automated the painful parts of publishing without losing the creative control that makes your book yours.',
     items: [
       {
         title: 'Voice that fits your story',
         description:
-          'Cinema-grade AI narration tuned for pacing, emotion, and clarity. Hear your book as if a professional actor read it.',
+          'Cinema-grade AI narration tuned for pacing, emotion, and clarity. Hear your book like a professional actor recorded it.',
         icon: 'headphones',
         image:
           'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=600&q=80&auto=format&fit=crop',
@@ -80,7 +85,7 @@ const dictionary: Dictionary = {
       {
         title: 'Typesetting without the tutorials',
         description:
-          'Automatic 6x9″ print layout with chapter breaks, ornaments, margins, and page numbers dialed to spec.',
+          'Automatic print layout with trim sizes, chapter breaks, ornaments, margins, and page numbers dialed to spec.',
         icon: 'printer',
         image:
           'https://images.unsplash.com/photo-1448932252197-d19750584e56?w=600&q=80&auto=format&fit=crop',
@@ -88,7 +93,7 @@ const dictionary: Dictionary = {
       {
         title: 'Distribution ready files',
         description:
-          'Export packages that pass ACX, KDP, and IngramSpark on the first try. No fiddling with file settings.',
+          'Export packages that pass ACX, KDP, and IngramSpark on the first try. No fiddling with audio or PDF settings.',
         icon: 'book',
         image:
           'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&q=80&auto=format&fit=crop',
@@ -96,7 +101,7 @@ const dictionary: Dictionary = {
       {
         title: 'Fast enough for launch week',
         description:
-          'Generate narration and print layout in minutes, not months. Perfect for hitting preorder dates or crowdfunding promises.',
+          'Generate narration and print layout in minutes. Perfect for hitting preorder dates, press kits, or crowdfunding promises.',
         icon: 'zap',
         image:
           'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&q=80&auto=format&fit=crop',
@@ -120,7 +125,7 @@ const dictionary: Dictionary = {
     ],
   },
   callout: {
-    tag: 'built for authors, by authors',
+    tag: 'beta slots now open',
     title: "You focus on the story. We'll package it for every shelf.",
     description:
       'Preview narration, tweak pacing, and export ready-to-upload files in one sitting. No more juggling freelancers or learning design software.',
@@ -129,7 +134,7 @@ const dictionary: Dictionary = {
   benefits: {
     title: 'Why writers choose Literati Pub',
     description:
-      "We obsessed over the indie author journey so you don't have to hire a team or learn new software.",
+      'We obsessed over the indie author journey so you do not have to hire a team or learn new software.',
     items: [
       {
         title: 'Save launch budget',

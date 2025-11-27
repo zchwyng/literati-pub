@@ -13,6 +13,8 @@ export type Dictionary = {
     title: string;
     highlight: string;
     description: string;
+    ctaPrimary: string;
+    ctaSecondary: string;
     checklist: string[];
     uploaderNote: string;
     quickSteps: string[];

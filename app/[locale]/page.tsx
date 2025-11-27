@@ -46,6 +46,9 @@ export default async function Home({
   const localizedPath = (path: string) =>
     path === '/' ? `/${locale}` : `/${locale}${path}`;
 
+  const primaryCtaHref = localizedPath(user ? '/dashboard' : '/handler/sign-up');
+  const workflowHref = localizedPath('#how-it-works');
+
   return (
     <div className="relative min-h-screen font-sans">
       {/* Background */}
@@ -108,7 +111,7 @@ export default async function Home({
       </nav>
 
       {/* Hero Section */}
-      <div className="relative z-10 pt-16 pb-16 sm:pt-24 sm:pb-24">
+      <div id="hero" className="relative z-10 pt-16 pb-16 sm:pt-24 sm:pb-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm text-primary backdrop-blur-md shadow-sm">
@@ -126,6 +129,24 @@ export default async function Home({
               </p>
             </div>
 
+            <div className="flex flex-wrap gap-3">
+              <Button
+                asChild
+                size="lg"
+                className="rounded-full px-6 shadow-lg hover:shadow-md transition-all"
+              >
+                <Link href={primaryCtaHref}>{dictionary.hero.ctaPrimary}</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="rounded-full border-primary/40 text-primary hover:bg-primary/10"
+              >
+                <Link href={workflowHref}>{dictionary.hero.ctaSecondary}</Link>
+              </Button>
+            </div>
+
             <div className="flex flex-wrap gap-3 text-sm text-zinc-600 dark:text-zinc-300">
               {dictionary.hero.checklist.map((item) => (
                 <span
@@ -139,7 +160,7 @@ export default async function Home({
             </div>
 
             <div className="grid gap-4">
-              <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/60 backdrop-blur-lg shadow-lg p-4">
+              <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/60 backdrop-blur-lg shadow-lg p-4">
                 <LandingUploader />
                 <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400 font-medium">
                   {dictionary.hero.uploaderNote}
@@ -160,7 +181,7 @@ export default async function Home({
 
           <div className="relative">
             <div className="absolute -inset-8 bg-primary/10 blur-3xl rounded-3xl" />
-            <div className="relative rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 shadow-2xl p-8 space-y-8">
+            <div className="relative rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white/85 dark:bg-zinc-900/80 shadow-2xl p-8 space-y-8">
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-2xl bg-primary/15 text-primary flex items-center justify-center">
                   <Feather className="h-6 w-6" />
@@ -253,7 +274,10 @@ export default async function Home({
       </div>
 
       {/* How It Works */}
-      <div className="relative z-10 py-24 bg-white/80 dark:bg-zinc-950/70 backdrop-blur-xl border-y border-zinc-200 dark:border-zinc-800">
+      <div
+        id="how-it-works"
+        className="relative z-10 py-24 bg-white/80 dark:bg-zinc-950/70 backdrop-blur-xl border-y border-zinc-200 dark:border-zinc-800"
+      >
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl mb-4">
@@ -273,7 +297,10 @@ export default async function Home({
       </div>
 
       {/* Feature Grid */}
-      <div className="relative z-10 py-28 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-xl">
+      <div
+        id="features"
+        className="relative z-10 py-28 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-xl"
+      >
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl mb-4">
@@ -309,14 +336,17 @@ export default async function Home({
               </p>
             </div>
             <Button asChild className="rounded-full px-6 shadow-lg hover:shadow-md transition-all">
-              <Link href={localizedPath('#')}>{dictionary.callout.action}</Link>
+              <Link href={primaryCtaHref}>{dictionary.callout.action}</Link>
             </Button>
           </div>
         </div>
       </div>
 
       {/* Benefits Section */}
-      <div className="relative z-10 py-24 bg-white/80 dark:bg-zinc-950/70 backdrop-blur-xl border-t border-zinc-200 dark:border-zinc-800">
+      <div
+        id="benefits"
+        className="relative z-10 py-24 bg-white/80 dark:bg-zinc-950/70 backdrop-blur-xl border-t border-zinc-200 dark:border-zinc-800"
+      >
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl mb-4">
