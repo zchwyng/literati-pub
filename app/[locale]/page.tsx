@@ -3,6 +3,7 @@ import { stackServerApp } from '../../stack';
 import LandingUploader from '../components/LandingUploader';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   BookOpen,
   Headphones,
@@ -60,9 +61,14 @@ export default async function Home({
           <div className="h-8 w-8 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-lg flex items-center justify-center shadow-sm">
             <ScrollText className="h-4 w-4" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
-            {dictionary.nav.brand}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
+              {dictionary.nav.brand}
+            </span>
+            <Badge className="bg-primary/10 text-primary border-primary/30 text-xs px-2 py-0.5">
+              {dictionary.nav.beta}
+            </Badge>
+          </div>
         </div>
         <div className="flex gap-4 items-center">
           <LanguageSwitcher />
