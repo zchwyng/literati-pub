@@ -20,7 +20,7 @@ function getPathnameLocale(pathname: string): string | undefined {
   );
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { nextUrl } = request;
   const pathname = nextUrl.pathname;
 

@@ -29,12 +29,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = (headers().get('x-locale') as Locale | null) ?? i18n.defaultLocale;
+  const headersList = await headers();
+  const locale =
+    (headersList.get('x-locale') as Locale | null) ?? i18n.defaultLocale;
 
   return (
     <html lang={locale} suppressHydrationWarning>
