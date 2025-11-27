@@ -5,6 +5,8 @@ import { stackServerApp } from '../stack';
 import { ThemeProvider } from './components/ThemeProvider';
 import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
+import { headers } from 'next/headers';
+import { i18n, type Locale } from '../i18n-config';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
