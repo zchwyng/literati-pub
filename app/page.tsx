@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { stackServerApp } from '../stack';
 import LandingUploader from './components/LandingUploader';
 import { Button } from '@/components/ui/button';
+import { getAuthenticatedUser } from '../lib/auth';
 import {
   BookOpen,
   Headphones,
@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export default async function Home() {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
 
   return (
     <div className="relative min-h-screen font-sans">

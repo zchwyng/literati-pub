@@ -3,7 +3,7 @@
 import OpenAI from 'openai';
 import { put } from '@vercel/blob';
 import { pool } from './db';
-import { stackServerApp } from '../stack';
+import { getAuthenticatedUser } from '../lib/auth';
 import { revalidatePath, cacheTag, revalidateTag } from 'next/cache';
 
 // --- Internal Cached Functions ---
@@ -76,7 +76,7 @@ async function getCoverGenerationsInternal(projectId: string) {
 // --- Project Management ---
 
 export async function createProject(title: string, content: string) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) throw new Error('Unauthorized');
 
   if (!title || !content) {
@@ -94,13 +94,13 @@ export async function createProject(title: string, content: string) {
 }
 
 export async function getProjects() {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) return [];
   return getProjectsInternal(user.id);
 }
 
 export async function getProject(id: string) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) return null;
   return getProjectInternal(id, user.id);
 }
@@ -109,7 +109,7 @@ export async function updateProject(
   id: string,
   data: { title?: string; content?: string }
 ) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) throw new Error('Unauthorized');
 
   const updates: string[] = [];
@@ -145,7 +145,7 @@ export async function updateProject(
 }
 
 export async function deleteProject(id: string) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) throw new Error('Unauthorized');
 
   await pool.query('DELETE FROM projects WHERE id = $1 AND user_id = $2', [
@@ -158,7 +158,7 @@ export async function deleteProject(id: string) {
 }
 
 export async function togglePinProject(id: string) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) throw new Error('Unauthorized');
 
   // First get current pinned status
@@ -197,7 +197,7 @@ export async function togglePinProject(id: string) {
 }
 
 export async function toggleArchiveProject(id: string) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) throw new Error('Unauthorized');
 
   // First get current archived status
@@ -244,7 +244,7 @@ export async function toggleArchiveProject(id: string) {
 // --- TTS & Audio ---
 
 export async function getAudioGenerations(projectId: string) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) return [];
 
   // Verify ownership implicitly by joining or checking project first.
@@ -255,7 +255,7 @@ export async function getAudioGenerations(projectId: string) {
 }
 
 export async function generateTtsForProject(projectId: string) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) throw new Error('Unauthorized');
 
   const project = await getProject(projectId);
@@ -307,7 +307,7 @@ export async function generateCoverImage(
   prompt: string,
   model: string = 'dalle-3'
 ) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) throw new Error('Unauthorized');
 
   const project = await getProject(projectId);
@@ -384,7 +384,7 @@ export async function generateCoverImage(
 }
 
 export async function getCoverGenerations(projectId: string) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) return [];
 
   const project = await getProject(projectId);

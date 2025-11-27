@@ -2,7 +2,7 @@
 
 import { put } from '@vercel/blob';
 import { pool } from '../db';
-import { stackServerApp } from '../../stack';
+import { getAuthenticatedUser } from '../../lib/auth';
 import { revalidatePath, cacheTag, revalidateTag } from 'next/cache';
 import mammoth from 'mammoth';
 import chromium from '@sparticuz/chromium';
@@ -158,7 +158,7 @@ export async function createPrintJob(
   format: 'print' | 'ebook' = 'print',
   fontKey: FontKey = 'baskerville'
 ) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) throw new Error('Unauthorized');
 
   const file = formData.get('file') as File;
@@ -224,7 +224,7 @@ export async function createPrintJobFromContent(
   format: 'print' | 'ebook' = 'print',
   fontKey: FontKey = 'baskerville'
 ) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) throw new Error('Unauthorized');
 
   try {
@@ -274,7 +274,7 @@ async function getPrintJobsInternal(projectId: string) {
 }
 
 export async function getPrintJobs(projectId: string) {
-  const user = await stackServerApp.getUser();
+  const user = await getAuthenticatedUser();
   if (!user) return [];
 
   return getPrintJobsInternal(projectId);
