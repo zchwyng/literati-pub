@@ -225,14 +225,47 @@ export function ProjectRightSidebar() {
   const isCollapsed = state === 'collapsed';
 
   return (
-    <Sidebar
-      side="right"
-      collapsible={isCollapsed ? 'offcanvas' : 'none'}
-      className={cn(
-        "sticky top-0 hidden h-svh border-l lg:flex",
-        isCollapsed && "hidden"
-      )}
+    <div
+      className="group peer text-sidebar-foreground hidden md:block"
+      data-state={isCollapsed ? "collapsed" : "expanded"}
+      data-collapsible={isCollapsed ? "offcanvas" : ""}
+      data-side="right"
+      data-slot="sidebar"
     >
+      {/* This is what handles the sidebar gap on desktop */}
+      <div
+        data-slot="sidebar-gap"
+        className={cn(
+          "relative bg-transparent transition-[width] duration-200 ease-linear",
+          "w-[16rem]",
+          isCollapsed && "w-0"
+        )}
+        style={{
+          '--sidebar-width': SIDEBAR_WIDTH,
+        } as React.CSSProperties}
+      />
+      <div
+        data-slot="sidebar-container"
+        className={cn(
+          "fixed inset-y-0 z-10 hidden h-svh transition-[right] duration-200 ease-linear md:flex",
+          "right-0 w-[16rem]",
+          isCollapsed && "right-[calc(var(--sidebar-width)*-1)]",
+          "border-l"
+        )}
+        style={{
+          '--sidebar-width': SIDEBAR_WIDTH,
+        } as React.CSSProperties}
+      >
+        <div
+          data-sidebar="sidebar"
+          data-slot="sidebar-inner"
+          className="bg-sidebar flex h-full w-full flex-col border-l"
+        >
+          <Sidebar
+            side="right"
+            collapsible="none"
+            className="h-full w-full"
+          >
           <SidebarHeader className="h-16 border-b border-sidebar-border flex flex-row items-center justify-between px-4">
             <span className="text-sm font-semibold">Binder</span>
           </SidebarHeader>
@@ -841,6 +874,9 @@ export function ProjectRightSidebar() {
             )}
           </SidebarFooter>
           <SidebarRail />
-    </Sidebar>
+          </Sidebar>
+        </div>
+      </div>
+    </div>
   );
 }
